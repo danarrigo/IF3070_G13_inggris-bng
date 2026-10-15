@@ -1,0 +1,19 @@
+#root {
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+main {
+  width: min(100%, 640px);
+  padding: clamp(24px, 6vw, 56px);
+  background: #fff;
+  border: 1px solid #dce3ef;
+  border-radius: 16px;
+}
+
+h1 { font-size: clamp(2rem, 6vw, 3rem); margin: 12px 0; }
+p { line-height: 1.6; }
+.eyebrow { color: #52627d; font-size: 0.8rem; letter-spacing: 0.15em; }
+.status { padding: 16px; background: #edf2fc; border-radius: 8px; margin: 24px 0; }

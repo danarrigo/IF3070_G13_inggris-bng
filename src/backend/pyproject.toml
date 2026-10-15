@@ -1,0 +1,18 @@
+[project]
+name = "dai-backend"
+version = "0.1.0"
+description = "FastAPI backend for the DAI project"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi[standard]>=0.115,<1",
+]
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28,<1",
+    "pytest>=8,<10",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
