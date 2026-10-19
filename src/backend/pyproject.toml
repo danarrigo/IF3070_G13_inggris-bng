@@ -5,6 +5,7 @@ description = "FastAPI backend for the DAI project"
 requires-python = ">=3.12"
 dependencies = [
     "fastapi[standard]>=0.115,<1",
+    "pymongo>=4.19.0",
 ]
 
 [dependency-groups]

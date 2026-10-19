@@ -13,6 +13,23 @@
 
 Run each server in a separate terminal from the repository root.
 
+### MongoDB
+
+MongoDB runs in Docker while the backend and frontend stay local:
+
+```bash
+docker compose up -d mongodb
+```
+
+The database is available from local applications at `mongodb://devroot:devrootpassword@localhost:27017/?authSource=admin`.
+The data persists in the `mongodb_data` Docker volume. Stop the container with:
+
+```bash
+docker compose down
+```
+
+To remove the database data as well, use `docker compose down -v`. Credentials and the host port can be overridden in a root `.env` file with `MONGO_ROOT_USERNAME`, `MONGO_ROOT_PASSWORD`, and `MONGO_PORT`.
+
 ### Backend
 
 ```bash
