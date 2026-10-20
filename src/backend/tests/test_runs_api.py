@@ -8,6 +8,7 @@ from pymongo.errors import DuplicateKeyError, ServerSelectionTimeoutError
 from core.database import get_database
 from main import app
 from models.run import RunModel
+from services.run_service import hash_config
 
 
 @pytest.mark.parametrize(
@@ -46,6 +47,9 @@ def test_run_endpoints(method: str, case: str, expected_status: int) -> None:
         },
     })
     payload = run.model_dump(mode="json")
+    request_payload = {
+        key: payload[key] for key in ("config", "settings", "random_seed", "result")
+    }
     db = MagicMock()
     document = {"_id": str(run.id), **payload}
     db["runs"].find_one.return_value = None if case == "missing" else document
@@ -78,12 +82,23 @@ def test_run_endpoints(method: str, case: str, expected_status: int) -> None:
                 response = await client.request(
                     method,
                     path,
-                    json=({} if case == "invalid" else payload)
+                    json=({} if case == "invalid" else request_payload)
                     if method == "POST"
                     else None,
                 )
             assert response.status_code == expected_status
-            if expected_status in {200, 201}:
+            if expected_status == 201:
+                response_run = RunModel.model_validate(response.json())
+                assert response_run.configHash == hash_config(run.config)
+                assert response_run.id != run.id
+                assert response_run.model_dump(mode="json", exclude={
+                    "id", "created_at", "configHash"
+                }) == request_payload
+                db["runs"].insert_one.assert_called_once_with({
+                    "_id": str(response_run.id),
+                    **response_run.model_dump(mode="json"),
+                })
+            if expected_status == 200:
                 expected = (
                     [] if case == "empty"
                     else [payload] if case in {"list", "filtered"}

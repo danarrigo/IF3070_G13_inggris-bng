@@ -4,6 +4,7 @@ from fastapi import APIRouter, HTTPException, Response
 from pymongo.errors import DuplicateKeyError
 
 from core.database import DatabaseDep
+from dtos.run import CreateRunRequest
 from models.run import RunModel
 from repository.run_repository import (
     delete_run_by_id,
@@ -11,13 +12,15 @@ from repository.run_repository import (
     find_runs,
     insert_run,
 )
+from services.run_service import build_run
 
 router = APIRouter()
 
 
 @router.post("/api/runs", response_model=RunModel, status_code=201)
-def create_run(db: DatabaseDep, run: RunModel):
+def create_run(db: DatabaseDep, run_request: CreateRunRequest):
     try:
+        run = build_run(run_request)
         _ = insert_run(db, run)
     except DuplicateKeyError as exc:
         raise HTTPException(status_code=409, detail="Run already exists") from exc
