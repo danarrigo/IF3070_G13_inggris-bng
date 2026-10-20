@@ -4,6 +4,8 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from pydantic import BaseModel
 
+from api.config import router as config_router
+from api.runs import router as runs_router
 from core.database import create_client
 
 
@@ -18,6 +20,8 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 
 
 app = FastAPI(title="DAI API", lifespan=lifespan)
+app.include_router(config_router)
+app.include_router(runs_router)
 
 
 class HealthResponse(BaseModel):

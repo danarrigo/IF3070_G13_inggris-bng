@@ -1,6 +1,6 @@
-from typing import cast
+from typing import Annotated, TypeAlias, cast
 
-from fastapi import FastAPI, Request
+from fastapi import Depends, FastAPI, Request
 from pymongo import MongoClient
 from pymongo.database import Database
 
@@ -18,3 +18,8 @@ def get_database(request: Request) -> Database[dict[str, object]]:
     app = cast(FastAPI, request.app)
     client = cast(MongoClient[dict[str, object]], app.state.mongo_client)
     return client[settings.mongodb_database]
+
+
+DatabaseDep: TypeAlias = Annotated[
+    Database[dict[str, object]], Depends(get_database)
+]

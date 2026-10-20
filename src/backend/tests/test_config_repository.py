@@ -2,10 +2,10 @@ from unittest.mock import MagicMock
 
 from models.config import ConfigModel, Ship, Vehicle
 from repository.config_repository import (
-    create_config,
-    delete_config,
-    get_config,
-    update_config,
+    insert_config,
+    remove_config,
+    find_config,
+    replace_config,
 )
 
 
@@ -22,7 +22,7 @@ def test_create_uses_fixed_id_and_serializes_uuid() -> None:
     db = MagicMock()
     config = make_config()
 
-    create_config(db, config)
+    insert_config(db, config)
 
     db["config"].insert_one.assert_called_once_with(
         {"_id": "config", **config.model_dump(mode="json")}
@@ -34,7 +34,7 @@ def test_create_uses_fixed_id_and_serializes_uuid() -> None:
 def test_delete_uses_fixed_id() -> None:
     db = MagicMock()
 
-    delete_config(db)
+    remove_config(db)
 
     db["config"].delete_one.assert_called_once_with({"_id": "config"})
 
@@ -42,7 +42,7 @@ def test_delete_uses_fixed_id() -> None:
 def test_get_uses_fixed_id() -> None:
     db = MagicMock()
 
-    get_config(db)
+    find_config(db)
 
     db["config"].find_one.assert_called_once_with({"_id": "config"})
 
@@ -51,7 +51,7 @@ def test_update_uses_same_document_structure_as_create() -> None:
     db = MagicMock()
     config = make_config()
 
-    update_config(db, config)
+    replace_config(db, config)
 
     db["config"].replace_one.assert_called_once_with(
         {"_id": "config"}, config.model_dump(mode="json")

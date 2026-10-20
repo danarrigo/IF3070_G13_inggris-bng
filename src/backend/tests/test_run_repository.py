@@ -2,7 +2,12 @@ from unittest.mock import MagicMock
 from uuid import uuid4
 
 from models.run import RunModel
-from repository.run_repository import create_run, delete_run, get_run, list_runs
+from repository.run_repository import (
+    delete_run_by_id,
+    find_run_by_id,
+    find_runs,
+    insert_run,
+)
 
 
 def test_create_uses_run_id_and_serializes_document() -> None:
@@ -26,7 +31,7 @@ def test_create_uses_run_id_and_serializes_document() -> None:
         },
     })
 
-    create_run(db, run)
+    insert_run(db, run)
 
     db["runs"].insert_one.assert_called_once_with({
         "_id": str(run.id),
@@ -41,7 +46,7 @@ def test_get_uses_run_id() -> None:
     db = MagicMock()
     run_id = uuid4()
 
-    get_run(db, run_id)
+    find_run_by_id(db, run_id)
 
     db["runs"].find_one.assert_called_once_with({"_id": str(run_id)})
 
@@ -51,7 +56,7 @@ def test_list_returns_all_runs_newest_first() -> None:
     documents = [{"id": "example"}]
     db["runs"].find.return_value.sort.return_value = iter(documents)
 
-    assert list_runs(db) == documents
+    assert find_runs(db) == documents
 
     db["runs"].find.assert_called_once_with({})
     db["runs"].find.return_value.sort.assert_called_once_with("created_at", -1)
@@ -60,7 +65,7 @@ def test_list_returns_all_runs_newest_first() -> None:
 def test_list_filters_by_config_hash() -> None:
     db = MagicMock()
 
-    list_runs(db, config_hash="example_hash")
+    find_runs(db, config_hash="example_hash")
 
     db["runs"].find.assert_called_once_with({"configHash": "example_hash"})
 
@@ -69,6 +74,6 @@ def test_delete_uses_run_id() -> None:
     db = MagicMock()
     run_id = uuid4()
 
-    delete_run(db, run_id)
+    delete_run_by_id(db, run_id)
 
     db["runs"].delete_one.assert_called_once_with({"_id": str(run_id)})
