@@ -29,10 +29,12 @@ async function readConfig(response: Response): Promise<Config> {
   }
   const data: unknown = await response.json()
   if (!isRecord(data) || !isShip(data.ship) || !Array.isArray(data.vehicles)
-    || !data.vehicles.every(isVehicle)) {
+    || !data.vehicles.every(isVehicle)
+    || (data.preserve_positions !== undefined && typeof data.preserve_positions !== 'boolean')) {
     throw new Error('The API returned an unexpected config format.')
   }
-  return { ship: data.ship, vehicles: data.vehicles }
+  return { ship: data.ship, vehicles: data.vehicles,
+    preserve_positions: data.preserve_positions === true }
 }
 
 export async function loadConfig(): Promise<Config | null> {

@@ -18,4 +18,5 @@ export interface Vehicle {
 export interface Config {
   ship: Ship
   vehicles: Vehicle[]
+  preserve_positions: boolean
 }

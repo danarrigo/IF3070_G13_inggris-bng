@@ -9,6 +9,7 @@ from core.database import get_database
 from main import app
 
 
+@pytest.mark.parametrize("preserve_positions", [False, True])
 @pytest.mark.parametrize(
     ("method", "case", "expected_status"),
     [
@@ -23,21 +24,20 @@ from main import app
         ("DELETE", "missing", 404),
     ],
 )
-def test_config_endpoints(method: str, case: str, expected_status: int) -> None:
+def test_config_endpoints(
+    method: str, case: str, expected_status: int, preserve_positions: bool
+) -> None:
     db = MagicMock()
     payload = {
         "ship": {"length": 10, "width": 5, "max_weight": 1000},
         "vehicles": [],
+        "preserve_positions": preserve_positions,
     }
     db["config"].find_one.return_value = (
         None if case == "missing" else {"_id": "config", **payload}
     )
-    db["config"].replace_one.return_value.matched_count = (
-        0 if case == "missing" else 1
-    )
-    db["config"].delete_one.return_value.deleted_count = (
-        0 if case == "missing" else 1
-    )
+    db["config"].replace_one.return_value.matched_count = 0 if case == "missing" else 1
+    db["config"].delete_one.return_value.deleted_count = 0 if case == "missing" else 1
     if case == "duplicate":
         db["config"].insert_one.side_effect = DuplicateKeyError("duplicate")
 

@@ -23,4 +23,4 @@ class Vehicle(BaseModel):
 class ConfigModel(BaseModel):
     ship: Ship
     vehicles: list[Vehicle]
-
+    preserve_positions: bool = False

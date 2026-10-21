@@ -42,7 +42,7 @@ def test_preserves_user_placements_and_can_only_fit_another_vehicle_rotated() ->
     config = ConfigModel(
         ship=Ship(length=2, width=2, max_weight=20), vehicles=[fixed, pending]
     )
-    result = initialize_arrangement(config, Random(4))
+    result = initialize_arrangement(config, Random(4), preserve_positions=True)
     assert len(result) == 2
     assert (result[0].vehicle_id, result[0].x, result[0].y) == (fixed.id, 0, 0)
     assert (result[1].length, result[1].width, result[1].x, result[1].y) == (1, 2, 0, 1)
@@ -68,9 +68,24 @@ def test_rejects_invalid_existing_placements_and_attempt_limit() -> None:
         ship=Ship(length=2, width=2, max_weight=100), vehicles=[make_vehicle(x=0)]
     )
     with pytest.raises(ValueError, match="both X and Y"):
-        initialize_arrangement(config, Random(1))
+        initialize_arrangement(config, Random(1), preserve_positions=True)
     with pytest.raises(ValueError, match="positive"):
         initialize_arrangement(config, Random(1), max_attempts_per_vehicle=0)
+
+
+def test_default_randomizes_even_explicit_positions() -> None:
+    vehicle = make_vehicle(x=0, y=0)
+    config = ConfigModel(
+        ship=Ship(length=10, width=8, max_weight=100), vehicles=[vehicle]
+    )
+    positions = {
+        (state[0].x, state[0].y)
+        for seed in range(10)
+        if (state := initialize_arrangement(config, Random(seed)))
+    }
+    assert len(positions) > 1
+    assert (vehicle.x, vehicle.y) == (0, 0)
+    assert initialize_arrangement(config, Random(1), preserve_positions=True)[0].x == 0
 
 
 def test_empty_config_initializes_to_an_empty_arrangement() -> None:

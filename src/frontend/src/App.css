@@ -44,8 +44,16 @@ input:disabled { opacity: .65; }
 .range-row label { min-width: 0; }
 .range-row input { padding: 7px 10px; font-size: .72rem; }
 .vehicle-generator .error { margin-top: 12px; }
-.initial-state-note { font-size: .7rem; color: #63715d; line-height: 1.65; margin: 0 0 18px; }
-.initial-state-note strong { font-weight: 600; }
+.start-mode { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 20px; cursor: pointer; }
+.start-mode strong { display: block; font-size: .75rem; font-weight: 550; }
+.start-mode small { display: block; font-size: .66rem; color: #7b8972; line-height: 1.6; margin-top: 6px; }
+.start-mode input { position: absolute; right: 0; top: 50%; transform: translateY(-50%); width: 38px; height: 24px; margin: 0; opacity: 0; cursor: pointer; }
+.switch-track { flex: 0 0 36px; height: 21px; border-radius: 20px; background: #d7dfd1; pointer-events: none; position: relative; transition: background .15s; }
+.switch-track::after { content: ''; position: absolute; left: 3px; top: 3px; width: 15px; height: 15px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px #24332526; transition: transform .15s; }
+.start-mode input:checked + .switch-track { background: #3f6750; }
+.start-mode input:checked + .switch-track::after { transform: translateX(15px); }
+.start-mode input:focus-visible + .switch-track { outline: 2px solid #41674e; outline-offset: 4px; }
+.start-mode:has(input:disabled) { opacity: .6; cursor: wait; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
 .empty-state { padding: 15px; border: 1px dashed #dce3d4; border-radius: 5px; }
 .empty-state h3 { color: #7c8b6f; font-size: .72rem; }

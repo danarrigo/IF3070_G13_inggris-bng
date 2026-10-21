@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState } from 'react'
+import { lazy, Suspense, useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
 import { loadConfig, saveConfig } from './api/config'
 import VehicleGenerator from './components/VehicleGenerator'
@@ -10,19 +10,21 @@ const ShipBackground = lazy(() => import('./components/ShipBackground'))
 const initialConfig: Config = {
   ship: { length: 20, width: 10, max_weight: 10000 },
   vehicles: [],
+  preserve_positions: false,
 }
 
-function NumberField({ label, value, min = 0, optional = false, onChange }: {
+function NumberField({ label, value, min = 0, optional = false, disabled = false, onChange }: {
   label: string
   value: number | null
   min?: number
   optional?: boolean
+  disabled?: boolean
   onChange: (value: number | null) => void
 }) {
   return (
     <label className="number-field">
       <span>{label}</span>
-      <input form="config-form" type="number" min={min} step={1} required={!optional}
+      <input form="config-form" type="number" min={min} step={1} required={!optional} disabled={disabled}
         value={value ?? ''} placeholder={optional ? 'Unplaced' : undefined}
         onChange={(event) => onChange(event.target.value === '' ? null : event.target.valueAsNumber)} />
     </label>
@@ -75,7 +77,7 @@ function App() {
 
   async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    if (config.vehicles.some((vehicle) => (vehicle.x === null) !== (vehicle.y === null))) {
+    if (config.preserve_positions && config.vehicles.some((vehicle) => (vehicle.x === null) !== (vehicle.y === null))) {
       setError('Set both X and Y for a vehicle, or leave both empty.')
       return
     }
@@ -92,11 +94,14 @@ function App() {
     }
   }
 
-  const placed = config.vehicles.filter((vehicle) => vehicle.x !== null && vehicle.y !== null)
+  const previewConfig = useMemo(() => config.preserve_positions ? config : {
+    ...config, vehicles: config.vehicles.map((vehicle) => ({ ...vehicle, x: null, y: null })),
+  }, [config])
+  const placed = previewConfig.vehicles.filter((vehicle) => vehicle.x !== null && vehicle.y !== null)
   const totalWeight = placed.reduce((sum, vehicle) => sum + vehicle.weight, 0)
   const warnings: string[] = []
   if (totalWeight > config.ship.max_weight) warnings.push('Placed vehicles exceed the ship weight capacity.')
-  config.vehicles.forEach((vehicle, index) => {
+  previewConfig.vehicles.forEach((vehicle, index) => {
     if (vehicle.x !== null && vehicle.y !== null
       && (vehicle.x + vehicle.width > config.ship.width || vehicle.y + vehicle.length > config.ship.length)) {
       warnings.push(`Vehicle ${index + 1} extends beyond the ship.`)
@@ -111,7 +116,7 @@ function App() {
   return (
     <main>
       <Suspense fallback={<div className="ship-background" aria-hidden="true" />}>
-        <ShipBackground config={config} />
+        <ShipBackground config={previewConfig} />
       </Suspense>
       <div className="config-shell">
       <form id="config-form" onSubmit={(event) => { void save(event) }} />
@@ -140,6 +145,20 @@ function App() {
                 <p className="field-hint">Drag the 3D background to rotate. Unplaced vehicles are staged beside the ship; vehicle height is illustrative.</p>
               </section>
 
+              <section className="panel start-options" aria-label="Initial state">
+                <label className="start-mode">
+                  <span><strong>Use custom starting positions</strong>
+                    <small>{config.preserve_positions
+                      ? 'Filled X/Y positions are preserved. Vehicles without positions are randomized.'
+                      : 'All positions are randomized when a run starts. Saved coordinates are ignored.'}</small>
+                  </span>
+                  <input type="checkbox" role="switch" checked={config.preserve_positions}
+                    aria-label="Use custom starting positions"
+                    onChange={(event) => edit({ ...config, preserve_positions: event.target.checked })} />
+                  <span className="switch-track" aria-hidden="true" />
+                </label>
+              </section>
+
               <section className="panel" aria-labelledby="vehicles-heading">
                 <div className="section-heading"><h2 id="vehicles-heading">Vehicles <span className="count">{config.vehicles.length}</span></h2>
                   <button type="button" className="text-button" onClick={addVehicle}>+ Add vehicle</button></div>
@@ -147,7 +166,6 @@ function App() {
                   edit({ ...config, vehicles })
                   setMessage(`Generated ${vehicles.length} vehicles. Customize any values below, then save your config.`)
                 }} />
-                <p className="initial-state-note"><strong>Want a fully random initial state?</strong> Leave both X and Y empty for every vehicle. Do not assign any vehicle a position. Random placement happens when starting an algorithm run; algorithm execution is not available yet.</p>
                 {config.vehicles.length === 0 && <div className="empty-state"><h3>No vehicles yet</h3>
                   <p>Generate vehicles using your ranges, or add one manually.</p></div>}
                 <div className="vehicle-list">
@@ -163,11 +181,12 @@ function App() {
                         {(['length', 'width', 'weight', 'eta', 'shipping_fee', 'x', 'y'] as const).map((key) => (
                           <NumberField key={key} label={key === 'shipping_fee' ? 'Shipping fee' : key === 'eta' ? 'ETA' : key === 'x' ? 'Position X' : key === 'y' ? 'Position Y' : key[0].toUpperCase() + key.slice(1)}
                             value={vehicle[key]} optional={key === 'x' || key === 'y'}
+                            disabled={!config.preserve_positions && (key === 'x' || key === 'y')}
                             min={key === 'length' || key === 'width' || key === 'weight' ? 1 : 0}
                             onChange={(value) => updateVehicle(vehicle.id, { [key]: value ?? (key === 'x' || key === 'y' ? null : 0) })} />
                         ))}
                       </div>
-                      <div className="vehicle-footer"><p className="field-hint">Leave both positions empty to keep unplaced.</p>
+                      <div className="vehicle-footer"><p className="field-hint">{config.preserve_positions ? 'Leave both positions empty to randomize this vehicle.' : 'Enable custom starting positions to edit X/Y.'}</p>
                         <button className="remove" type="button" aria-label={`Remove vehicle ${index + 1}`}
                           onClick={() => edit({ ...config, vehicles: config.vehicles.filter((item) => item.id !== vehicle.id) })}>Remove vehicle</button></div>
                       </div>
@@ -187,7 +206,7 @@ function App() {
               {config.ship.width > 0 && config.ship.length > 0 ? (
                 <div className="ship-grid" role="img" aria-label={`Ship grid, ${config.ship.width} wide by ${config.ship.length} long, ${placed.length} placed vehicles`}
                   style={{ width: `min(100%, 320px, ${460 * config.ship.width / config.ship.length}px)`, aspectRatio: `${config.ship.width} / ${config.ship.length}`, backgroundSize: `${100 / config.ship.width}% ${100 / config.ship.length}%` }}>
-                  {config.vehicles.map((vehicle, index) => vehicle.x !== null && vehicle.y !== null && (
+                  {previewConfig.vehicles.map((vehicle, index) => vehicle.x !== null && vehicle.y !== null && (
                     <div key={vehicle.id} className="grid-vehicle" title={`Vehicle ${index + 1}: (${vehicle.x}, ${vehicle.y}), ${vehicle.width} × ${vehicle.length}`}
                       style={{ left: `${vehicle.x / config.ship.width * 100}%`, top: `${vehicle.y / config.ship.length * 100}%`,
                         width: `${vehicle.width / config.ship.width * 100}%`, height: `${vehicle.length / config.ship.length * 100}%`, background: `hsl(${index * 67 + 165} 45% 35%)` }}>V{index + 1}</div>

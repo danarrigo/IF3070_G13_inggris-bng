@@ -29,16 +29,25 @@ class PreparedRun:
     rng: Random
 
 
-def prepare_run(db: Database[dict[str, object]], *, random_seed: int) -> PreparedRun:
+def prepare_run(
+    db: Database[dict[str, object]],
+    *,
+    random_seed: int,
+    preserve_positions: bool | None = None,
+) -> PreparedRun:
     """Load, validate and initialize a run. Does not execute or persist a result.
 
     Continue with the returned RNG so initialization and search share one seeded
     random stream. The config snapshot/hash retain the original user inputs;
-    actual randomized starting placements are in initial_arrangement.
+    actual randomized starting placements are in initial_arrangement. Assignment
+    experiments use the config's start-mode toggle (random by default). An explicit
+    preserve_positions argument overrides that saved setting.
     """
     config = load_config(db)
     rng = Random(random_seed)
-    placements = initialize_arrangement(config, rng)
+    placements = initialize_arrangement(
+        config, rng, preserve_positions=preserve_positions
+    )
     return PreparedRun(
         config=config,
         config_hash=hash_config(config),

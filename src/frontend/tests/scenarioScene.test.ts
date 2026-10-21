@@ -9,7 +9,7 @@ function vehicle(patch: Partial<Vehicle> = {}): Vehicle {
 }
 
 function config(vehicles: Vehicle[]): Config {
-  return { ship: { length: 20, width: 10, max_weight: 10000 }, vehicles }
+  return { ship: { length: 20, width: 10, max_weight: 10000 }, vehicles, preserve_positions: true }
 }
 
 function near(actual: number, expected: number) {

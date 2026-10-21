@@ -44,6 +44,29 @@ def test_preparation_randomizes_unplaced_vehicles() -> None:
     assert prepared.config.vehicles[0].y is None
 
 
+def test_saved_custom_start_setting_is_used_unless_explicitly_overridden() -> None:
+    config = ConfigModel.model_validate(
+        {
+            "ship": {"length": 10, "width": 10, "max_weight": 100},
+            "vehicles": [
+                Vehicle(
+                    length=2, width=1, weight=10, eta=0, shipping_fee=75, x=0, y=0
+                ).model_dump(mode="json")
+            ],
+            "preserve_positions": True,
+        }
+    )
+    db = MagicMock()
+    db["config"].find_one.return_value = config.model_dump(mode="json")
+    custom = prepare_run(db, random_seed=42)
+    assert (custom.initial_arrangement[0].x, custom.initial_arrangement[0].y) == (0, 0)
+    random_start = prepare_run(db, random_seed=42, preserve_positions=False)
+    assert (
+        random_start.initial_arrangement[0].x,
+        random_start.initial_arrangement[0].y,
+    ) != (0, 0)
+
+
 def test_missing_or_invalid_config_fails_preparation() -> None:
     db = MagicMock()
     db["config"].find_one.return_value = None
@@ -57,4 +80,4 @@ def test_missing_or_invalid_config_fails_preparation() -> None:
     )
     db["config"].find_one.return_value = config.model_dump(mode="json")
     with pytest.raises(ValueError, match="bounds"):
-        prepare_run(db, random_seed=1)
+        prepare_run(db, random_seed=1, preserve_positions=True)

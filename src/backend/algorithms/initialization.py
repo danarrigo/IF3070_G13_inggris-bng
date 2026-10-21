@@ -1,6 +1,10 @@
 from random import Random
 
-from algorithms.validation import placements_overlap, validate_initial_arrangement
+from algorithms.validation import (
+    placements_overlap,
+    validate_arrangement,
+    validate_initial_arrangement,
+)
 from models.config import ConfigModel, Vehicle
 from models.run import VehiclePlacement
 
@@ -10,16 +14,24 @@ def initialize_arrangement(
     rng: Random,
     *,
     max_attempts_per_vehicle: int = 100,
+    preserve_positions: bool | None = None,
 ) -> list[VehiclePlacement]:
-    """Preserve explicit placements and try to load the remaining vehicles randomly.
+    """Generate the assignment's random initial state by default.
 
-    Sampling is bounded: an unloaded vehicle may still have a feasible placement
+    The saved config flag selects custom-start mode; an explicit argument
+    overrides it. Old configs default to random mode. Sampling is bounded: an unloaded vehicle may still have a feasible placement
     that was not sampled. This is an initial solution, not an optimal packing.
     The caller owns the RNG; neither config nor global random state is changed.
     """
     if max_attempts_per_vehicle <= 0:
         raise ValueError("max_attempts_per_vehicle must be positive.")
-    errors = validate_initial_arrangement(config)
+    if preserve_positions is None:
+        preserve_positions = config.preserve_positions
+    errors = (
+        validate_initial_arrangement(config)
+        if preserve_positions
+        else validate_arrangement(config, [])
+    )
     if errors:
         raise ValueError("; ".join(errors))
 
@@ -27,7 +39,7 @@ def initialize_arrangement(
     pending: list[Vehicle] = []
     total_weight = 0
     for vehicle in config.vehicles:
-        if vehicle.x is not None and vehicle.y is not None:
+        if preserve_positions and vehicle.x is not None and vehicle.y is not None:
             placements.append(
                 VehiclePlacement(
                     vehicle_id=vehicle.id,
