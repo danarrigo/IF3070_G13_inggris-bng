@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+from typing import Literal
 
 from models.config import ConfigModel
 from models.run import (
@@ -16,3 +17,10 @@ class CreateRunRequest(BaseModel):
         HillClimbingSettings | SimulatedAnnealingSettings | GeneticAlgorithmSettings
     ) = Field(discriminator="algorithm")
     result: RunResult
+
+
+class AnnealingRequest(BaseModel):
+    config: ConfigModel
+    settings: SimulatedAnnealingSettings
+    random_seed: int = Field(default=42, ge=0, le=2**32 - 4)
+    run_count: Literal[1, 3] = 1

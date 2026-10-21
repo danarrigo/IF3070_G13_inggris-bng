@@ -14,9 +14,11 @@ class HillClimbingSettings(BaseModel):
 
 class SimulatedAnnealingSettings(BaseModel):
     algorithm: Literal["simulated_annealing"]
-    iterations: int = Field(gt=0)
-    initial_temperature: float = Field(gt=0)
-    cooling_rate: float = Field(gt=0, lt=1)
+    iterations: int = Field(gt=0, le=10000)
+    initial_temperature: float = Field(gt=0, le=1e12, allow_inf_nan=False)
+    cooling_rate: float = Field(gt=0, lt=1, allow_inf_nan=False)
+    minimum_temperature: float = Field(default=0.001, ge=1e-12, allow_inf_nan=False)
+    stagnation_window: int = Field(default=100, gt=0)
 
 
 class GeneticAlgorithmSettings(BaseModel):
@@ -40,6 +42,25 @@ class ObjectivePoint(BaseModel):
     objective: int = Field(ge=0)
 
 
+class AnnealingPoint(BaseModel):
+    iteration: int
+    temperature: float
+    objective: int
+    best_objective: int
+    delta: int | None
+    log_acceptance: float | None
+    exponential: float | None
+    acceptance_probability: float
+    accepted: bool
+    candidate_found: bool
+
+
+class StateSnapshot(BaseModel):
+    iteration: int
+    objective: int
+    arrangement: list[VehiclePlacement]
+
+
 class RunResult(BaseModel):
     final_arrangement: list[VehiclePlacement]
     unloaded_vehicle_ids: list[UUID]
@@ -47,6 +68,14 @@ class RunResult(BaseModel):
     final_objective: int = Field(ge=0)
     objective_history: list[ObjectivePoint]
     runtime_ms: float = Field(ge=0)
+    initial_arrangement: list[VehiclePlacement] = Field(default_factory=list)
+    last_arrangement: list[VehiclePlacement] = Field(default_factory=list)
+    best_objective: int = Field(default=0, ge=0)
+    iterations_completed: int = Field(default=0, ge=0)
+    stuck_count: int = Field(default=0, ge=0)
+    stop_reason: str = ""
+    annealing_history: list[AnnealingPoint] = Field(default_factory=list)
+    snapshots: list[StateSnapshot] = Field(default_factory=list)
 
 
 class RunModel(BaseModel):
