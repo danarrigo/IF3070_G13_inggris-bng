@@ -2,6 +2,7 @@ import { lazy, Suspense, useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
 import { loadConfig, saveConfig } from './api/config'
 import VehicleGenerator from './components/VehicleGenerator'
+import AnnealingPanel from './components/AnnealingPanel'
 import type { Config, Vehicle } from './types/config'
 import './App.css'
 
@@ -33,12 +34,14 @@ function NumberField({ label, value, min = 0, optional = false, disabled = false
 
 function App() {
   const [config, setConfig] = useState<Config>(initialConfig)
+  const [runPreviewConfig, setRunPreviewConfig] = useState<Config | null>(null)
   const [message, setMessage] = useState('Start with a ship, then add your vehicles.')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
   const [dirty, setDirty] = useState(false)
 
   function edit(next: Config) {
+    setRunPreviewConfig(null)
     setConfig(next)
     setDirty(true)
     setError('')
@@ -65,6 +68,7 @@ function App() {
         setMessage('No saved config yet. Your current draft has been kept.')
       } else {
         setConfig(saved)
+        setRunPreviewConfig(null)
         setDirty(false)
         setMessage('Loaded the saved configuration.')
       }
@@ -116,7 +120,7 @@ function App() {
   return (
     <main>
       <Suspense fallback={<div className="ship-background" aria-hidden="true" />}>
-        <ShipBackground config={previewConfig} />
+        <ShipBackground config={runPreviewConfig ?? previewConfig} />
       </Suspense>
       <div className="config-shell">
       <form id="config-form" onSubmit={(event) => { void save(event) }} />
@@ -196,6 +200,7 @@ function App() {
               </section>
             </div>
 
+            <AnnealingPanel config={config} onPreview={setRunPreviewConfig} />
             <details className="panel preview">
               <summary><span>Initial arrangement</span><span className="preview-summary">{placed.length} placed <span aria-hidden="true">+</span></span></summary>
               <div className="preview-body">
