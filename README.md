@@ -48,13 +48,15 @@ npm ci
 npm run dev
 ```
 
-Open the URL printed by Vite (usually http://localhost:5173). The starter page checks the backend connection. Vite proxies `/api` requests to `http://127.0.0.1:8000`, so no development CORS configuration is needed.
+Open the URL printed by Vite (usually http://localhost:5173). The scenario editor supports ship settings, a vehicle count with configurable random ranges (length, width, weight, shipping fee, and ETA), individual vehicle edits, an initial-arrangement grid preview, and saving/loading the main config. Generate creates unplaced vehicles; regenerating asks before replacing existing edits. Saving preserves the generated vehicles, not the generation controls. Start MongoDB and the backend to use save/load; editing and previewing work locally. Leave both vehicle positions empty for unplaced vehicles. Algorithm execution is not implemented yet.
+
+Vite proxies `/api` requests to `http://127.0.0.1:8000`, so no development CORS configuration is needed.
 
 ## Checks
 
 ```bash
 (cd src/backend && uv run pytest)
-(cd src/frontend && npm run lint && npm run build)
+(cd src/frontend && npm run lint && npm test && npm run build)
 ```
 
 For production, serve `src/frontend/dist` with a static web server and route `/api` to the FastAPI service. Vite's development proxy does not apply to production builds. Run the backend with `uv run fastapi run main.py` from `src/backend`.
