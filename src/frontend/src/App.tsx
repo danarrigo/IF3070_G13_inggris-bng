@@ -147,7 +147,7 @@ function App() {
                   edit({ ...config, vehicles })
                   setMessage(`Generated ${vehicles.length} vehicles. Customize any values below, then save your config.`)
                 }} />
-                <p className="initial-state-note"><strong>Want a fully random initial state?</strong> Leave both X and Y empty for every vehicle. Do not assign any vehicle a position. Random placement will be handled by algorithm initialization, which is not implemented yet.</p>
+                <p className="initial-state-note"><strong>Want a fully random initial state?</strong> Leave both X and Y empty for every vehicle. Do not assign any vehicle a position. Random placement happens when starting an algorithm run; algorithm execution is not available yet.</p>
                 {config.vehicles.length === 0 && <div className="empty-state"><h3>No vehicles yet</h3>
                   <p>Generate vehicles using your ranges, or add one manually.</p></div>}
                 <div className="vehicle-list">
