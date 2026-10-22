@@ -40,7 +40,55 @@ class ObjectivePoint(BaseModel):
     objective: int = Field(ge=0)
 
 
+class PopulationPoint(BaseModel):
+    generation: int = Field(ge=0)
+    maximum: int = Field(ge=0)
+    average: float = Field(ge=0)
+
+
+class DemoIndividual(BaseModel):
+    id: str
+    fitness: int
+    arrangement: list[VehiclePlacement]
+
+
+class DemoStep(BaseModel):
+    kind: Literal["population", "elite", "roulette", "crossover", "validation", "mutation", "admission", "generation"]
+    generation: int
+    pair: int | None = None
+    child: int | None = None
+    message: str
+    individuals: list[DemoIndividual] = Field(default_factory=list)
+    parent_ids: list[str] = Field(default_factory=list)
+    parents: list[list[VehiclePlacement]] = Field(default_factory=list)
+    arrangement: list[VehiclePlacement] | None = None
+    before: list[VehiclePlacement] | None = None
+    fitness: list[int] = Field(default_factory=list)
+    selected_index: int | None = None
+    draw: float | None = None
+    draw_kind: Literal["weighted", "uniform", "rate"] | None = None
+    rate: float | None = None
+    cut: int | None = None
+    attempt: int | None = None
+    accepted: bool | None = None
+    retained_children: list[int] = Field(default_factory=list)
+    errors: list[str] = Field(default_factory=list)
+    changed_vehicle_ids: list[UUID] = Field(default_factory=list)
+    operation: str | None = None
+
+
+class DemoTrace(BaseModel):
+    version: Literal[1] = 1
+    steps: list[DemoStep] = Field(default_factory=list)
+
+
 class RunResult(BaseModel):
+    demo_recorded: bool = False
+    demo_trace: DemoTrace | None = None
+    # Optional for runs saved before actual starting arrangements were recorded.
+    initial_arrangement: list[VehiclePlacement] | None = None
+    population_history: list[PopulationPoint] = Field(default_factory=list)
+    generations_completed: int | None = Field(default=None, ge=0)
     final_arrangement: list[VehiclePlacement]
     unloaded_vehicle_ids: list[UUID]
     initial_objective: int = Field(ge=0)
