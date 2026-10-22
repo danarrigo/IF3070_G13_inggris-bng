@@ -29,23 +29,25 @@ from services.run_service import hash_config
     ],
 )
 def test_run_endpoints(method: str, case: str, expected_status: int) -> None:
-    run = RunModel.model_validate({
-        "configHash": "example_hash",
-        "config": {
-            "ship": {"length": 10, "width": 5, "max_weight": 1000},
-            "vehicles": [],
-        },
-        "settings": {"algorithm": "hill_climbing", "iterations": 100},
-        "random_seed": 42,
-        "result": {
-            "final_arrangement": [],
-            "unloaded_vehicle_ids": [],
-            "initial_objective": 0,
-            "final_objective": 0,
-            "objective_history": [],
-            "runtime_ms": 1,
-        },
-    })
+    run = RunModel.model_validate(
+        {
+            "configHash": "example_hash",
+            "config": {
+                "ship": {"length": 10, "width": 5, "max_weight": 1000},
+                "vehicles": [],
+            },
+            "settings": {"algorithm": "hill_climbing", "iterations": 100},
+            "random_seed": 42,
+            "result": {
+                "final_arrangement": [],
+                "unloaded_vehicle_ids": [],
+                "initial_objective": 0,
+                "final_objective": 0,
+                "objective_history": [],
+                "runtime_ms": 1,
+            },
+        }
+    )
     payload = run.model_dump(mode="json")
     request_payload = {
         key: payload[key] for key in ("config", "settings", "random_seed", "result")
@@ -56,9 +58,7 @@ def test_run_endpoints(method: str, case: str, expected_status: int) -> None:
     db["runs"].find.return_value.sort.return_value = (
         [] if case == "empty" else [document]
     )
-    db["runs"].delete_one.return_value.deleted_count = (
-        0 if case == "missing" else 1
-    )
+    db["runs"].delete_one.return_value.deleted_count = 0 if case == "missing" else 1
     if case == "duplicate":
         db["runs"].insert_one.side_effect = DuplicateKeyError("duplicate")
     if case == "database_error":
@@ -91,17 +91,24 @@ def test_run_endpoints(method: str, case: str, expected_status: int) -> None:
                 response_run = RunModel.model_validate(response.json())
                 assert response_run.configHash == hash_config(run.config)
                 assert response_run.id != run.id
-                assert response_run.model_dump(mode="json", exclude={
-                    "id", "created_at", "configHash"
-                }) == request_payload
-                db["runs"].insert_one.assert_called_once_with({
-                    "_id": str(response_run.id),
-                    **response_run.model_dump(mode="json"),
-                })
+                assert (
+                    response_run.model_dump(
+                        mode="json", exclude={"id", "created_at", "configHash"}
+                    )
+                    == request_payload
+                )
+                db["runs"].insert_one.assert_called_once_with(
+                    {
+                        "_id": str(response_run.id),
+                        **response_run.model_dump(mode="json"),
+                    }
+                )
             if expected_status == 200:
                 expected = (
-                    [] if case == "empty"
-                    else [payload] if case in {"list", "filtered"}
+                    []
+                    if case == "empty"
+                    else [payload]
+                    if case in {"list", "filtered"}
                     else payload
                 )
                 assert response.json() == expected

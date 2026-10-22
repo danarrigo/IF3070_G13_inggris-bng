@@ -22,7 +22,17 @@ test('search placements preserve rotation and unloaded staging without changing 
 })
 
 function vehicle(patch: Partial<Vehicle> = {}): Vehicle {
-  return { id: 'vehicle-1', x: null, y: null, length: 4, width: 2, weight: 1000, eta: 0, shipping_fee: 500, ...patch }
+  return {
+    id: 'vehicle-1',
+    x: null,
+    y: null,
+    length: 4,
+    width: 2,
+    weight: 1000,
+    eta: 0,
+    shipping_fee: 500,
+    ...patch,
+  }
 }
 
 function config(vehicles: Vehicle[]): Config {
@@ -34,9 +44,9 @@ function near(actual: number, expected: number) {
 }
 
 test('maps grid X across the deck and Y along its length without shifting the origin', () => {
-  const [first, last] = layoutVehicles(config([
-    vehicle({ x: 0, y: 0 }), vehicle({ id: 'vehicle-2', x: 8, y: 16 }),
-  ]))
+  const [first, last] = layoutVehicles(
+    config([vehicle({ x: 0, y: 0 }), vehicle({ id: 'vehicle-2', x: 8, y: 16 })])
+  )
   assert(first.placed && last.placed)
   near(first.x, -7.2)
   near(first.z, -3.6)
@@ -55,7 +65,11 @@ test('uses the same uniform scale for ship and vehicle dimensions', () => {
 })
 
 test('stages every unplaced or partially positioned vehicle beside the ship without overlap', () => {
-  const input = config(Array.from({ length: 20 }, (_, index) => vehicle({ id: String(index), x: index === 0 ? 0 : null })))
+  const input = config(
+    Array.from({ length: 20 }, (_, index) =>
+      vehicle({ id: String(index), x: index === 0 ? 0 : null })
+    )
+  )
   const original = JSON.stringify(input)
   const layouts = layoutVehicles(input)
   assert.equal(layouts.length, 20)
@@ -63,8 +77,9 @@ test('stages every unplaced or partially positioned vehicle beside the ship with
     assert.equal(item.placed, false)
     assert(item.z - item.width / 2 > 4.5)
     for (const other of layouts.slice(index + 1)) {
-      const overlap = Math.abs(item.x - other.x) < (item.length + other.length) / 2
-        && Math.abs(item.z - other.z) < (item.width + other.width) / 2
+      const overlap =
+        Math.abs(item.x - other.x) < (item.length + other.length) / 2 &&
+        Math.abs(item.z - other.z) < (item.width + other.width) / 2
       assert.equal(overlap, false)
     }
   }
@@ -92,7 +107,11 @@ test('builds finite geometry for empty and populated configs and disposes it', (
     const scene = buildScenario(input)
     const bounds = new THREE.Box3().setFromObject(scene)
     assert(!bounds.isEmpty())
-    assert([bounds.min.x, bounds.min.y, bounds.min.z, bounds.max.x, bounds.max.y, bounds.max.z].every(Number.isFinite))
+    assert(
+      [bounds.min.x, bounds.min.y, bounds.min.z, bounds.max.x, bounds.max.y, bounds.max.z].every(
+        Number.isFinite
+      )
+    )
     disposeScenario(scene)
   }
 })

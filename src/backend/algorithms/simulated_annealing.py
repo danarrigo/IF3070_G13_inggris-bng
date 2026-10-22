@@ -11,8 +11,12 @@ from algorithms.objective import calculate_objective
 from algorithms.validation import validate_arrangement
 from models.config import ConfigModel
 from models.run import (
-    AnnealingPoint, ObjectivePoint, RunResult, SimulatedAnnealingSettings,
-    StateSnapshot, VehiclePlacement,
+    AnnealingPoint,
+    ObjectivePoint,
+    RunResult,
+    SimulatedAnnealingSettings,
+    StateSnapshot,
+    VehiclePlacement,
 )
 
 
@@ -38,8 +42,10 @@ def simulated_annealing(
             before = perf_counter()
             on_snapshot(snapshot)
             observer_seconds += perf_counter() - before
+
     current = (
-        initialize_arrangement(config, rng) if initial_arrangement is None
+        initialize_arrangement(config, rng)
+        if initial_arrangement is None
         else [p.model_copy(deep=True) for p in initial_arrangement]
     )
     errors = validate_arrangement(config, current)
@@ -62,16 +68,27 @@ def simulated_annealing(
             stop_reason = "minimum_temperature"
             break
         candidate = random_neighbor(config, current, rng)
-        delta = None if candidate is None else calculate_objective(config, candidate) - score
+        delta = (
+            None
+            if candidate is None
+            else calculate_objective(config, candidate) - score
+        )
         log_acceptance = None if delta is None else delta / temperature
         # null marks exponential overflow; the log value remains available.
         exponential = (
-            None if log_acceptance is None or log_acceptance > 709
+            None
+            if log_acceptance is None or log_acceptance > 709
             else math.exp(log_acceptance)
         )
-        probability = 0.0 if delta is None else acceptance_probability(delta, temperature)
-        accepted = candidate is not None and (delta >= 0 or rng.random() < probability)
-        if accepted:
+        probability = (
+            0.0 if delta is None else acceptance_probability(delta, temperature)
+        )
+        accepted = (
+            candidate is not None
+            and delta is not None
+            and (delta >= 0 or rng.random() < probability)
+        )
+        if accepted and candidate is not None and delta is not None:
             current = candidate
             score += delta
         if score > best_score:
@@ -82,27 +99,47 @@ def simulated_annealing(
             if stagnant >= settings.stagnation_window and not in_stagnation:
                 stuck_count += 1
                 in_stagnation = True
-        history.append(AnnealingPoint(
-            iteration=iteration, temperature=temperature, objective=score,
-            best_objective=best_score, delta=delta, log_acceptance=log_acceptance,
-            exponential=exponential, acceptance_probability=probability,
-            accepted=accepted, candidate_found=candidate is not None,
-        ))
+        history.append(
+            AnnealingPoint(
+                iteration=iteration,
+                temperature=temperature,
+                objective=score,
+                best_objective=best_score,
+                delta=delta,
+                log_acceptance=log_acceptance,
+                exponential=exponential,
+                acceptance_probability=probability,
+                accepted=accepted,
+                candidate_found=candidate is not None,
+            )
+        )
         objectives.append(ObjectivePoint(iteration=iteration, objective=score))
         if iteration % snapshot_interval == 0:
-            snapshots.append(StateSnapshot(iteration=iteration, objective=score, arrangement=current))
+            snapshots.append(
+                StateSnapshot(iteration=iteration, objective=score, arrangement=current)
+            )
             notify(snapshots[-1])
         temperature *= settings.cooling_rate
     completed = len(history)
     if snapshots[-1].iteration != completed:
-        snapshots.append(StateSnapshot(iteration=completed, objective=score, arrangement=current))
+        snapshots.append(
+            StateSnapshot(iteration=completed, objective=score, arrangement=current)
+        )
         notify(snapshots[-1])
     loaded = {p.vehicle_id for p in best}
     return RunResult(
-        initial_arrangement=initial, final_arrangement=best, last_arrangement=current,
+        initial_arrangement=initial,
+        final_arrangement=best,
+        last_arrangement=current,
         unloaded_vehicle_ids=[v.id for v in config.vehicles if v.id not in loaded],
-        initial_objective=initial_score, final_objective=best_score, best_objective=best_score,
-        objective_history=objectives, runtime_ms=(perf_counter() - started - observer_seconds) * 1000,
-        iterations_completed=completed, stuck_count=stuck_count, stop_reason=stop_reason,
-        annealing_history=history, snapshots=snapshots,
+        initial_objective=initial_score,
+        final_objective=best_score,
+        best_objective=best_score,
+        objective_history=objectives,
+        runtime_ms=(perf_counter() - started - observer_seconds) * 1000,
+        iterations_completed=completed,
+        stuck_count=stuck_count,
+        stop_reason=stop_reason,
+        annealing_history=history,
+        snapshots=snapshots,
     )

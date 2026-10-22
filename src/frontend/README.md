@@ -1,32 +1,25 @@
-# React + TypeScript + Vite
+# Ship optimizer frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+React, TypeScript, Vite, and Three.js. See the [repository README](../../README.md) for MongoDB/backend setup and algorithm behavior.
 
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+npm ci
+npm run dev
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+- `/#config`: edit, generate, save, and load scenarios.
+- `/#optimization`: run Steepest Ascent with live WebSocket progress, candidate previews, animated state changes, and an objective chart.
+- Vite forwards HTTP and WebSocket `/api` traffic to FastAPI on port 8000. Production hosting must support WebSocket upgrades too.
+- Drafts and results survive page navigation, but not a full browser refresh.
+
+## Checks
+
+```bash
+npm run format:check
+npm run lint
+npm run typecheck
+npm test
+npm run build
+```
+
+Use `npm run format` to apply Prettier formatting. Node-based tests cover protocol/state handling, bounded animation playback, scene layout, rotation, and GPU-resource disposal; browser testing is needed for actual WebGL and WebSocket behavior.

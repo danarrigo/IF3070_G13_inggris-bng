@@ -9,8 +9,8 @@ from models.run import (
     HillClimbingSettings,
     RunModel,
     RunResult,
-    VehiclePlacement,
     SimulatedAnnealingSettings,
+    VehiclePlacement,
 )
 
 
@@ -45,9 +45,7 @@ def test_run_metadata_and_json_round_trip() -> None:
 
 
 def test_placement_accepts_zero_coordinates() -> None:
-    placement = VehiclePlacement(
-        vehicle_id=uuid4(), x=0, y=0, length=4, width=2
-    )
+    placement = VehiclePlacement(vehicle_id=uuid4(), x=0, y=0, length=4, width=2)
     assert placement.x == 0
     assert placement.y == 0
 
