@@ -429,8 +429,9 @@ function App() {
                 type="button"
                 disabled={busy || running}
                 onClick={() => importInput.current?.click()}
+                title="Import experiment JSON from input/requests/ or input/config.json"
               >
-                Import experiment JSON
+                Import JSON
               </button>
               <input
                 ref={importInput}

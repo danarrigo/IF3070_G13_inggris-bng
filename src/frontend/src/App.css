@@ -141,6 +141,7 @@ p {
 }
 .toolbar {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
@@ -158,8 +159,14 @@ p {
 }
 .actions {
   display: flex;
-  gap: 7px;
+  flex-wrap: wrap;
+  gap: 5px;
+  max-width: 100%;
   flex-shrink: 0;
+}
+.actions button {
+  font-size: 0.62rem;
+  padding: 6px 7px;
 }
 button {
   font-size: 0.68rem;

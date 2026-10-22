@@ -2,7 +2,17 @@
 
 Tugas Besar 1 IF3070 Dasar Inteligensi Artifisial 2026/2027, **Kelompok 13 - inggris-bng**.
 
-Aplikasi ini mencari susunan kendaraan pada geladak kapal untuk memaksimalkan total shipping fee tanpa overlap, keluar batas geladak, atau melebihi kapasitas berat. Implementasi pencarian menggunakan Python: Steepest Ascent, Stochastic, Sideways, Random Restart Hill Climbing, Simulated Annealing, dan Genetic Algorithm. Antarmuka web menyediakan konfigurasi, visualisasi 2D/3D, grafik hasil, penyimpanan MongoDB, serta ekspor berkas eksperimen. Bonus objective ETA tersedia terpisah dari objective wajib shipping fee.
+## Tentang proyek
+
+Proyek ini merupakan aplikasi untuk mencari susunan kendaraan pada geladak kapal menggunakan algoritma **local search**. Setiap kendaraan memiliki ukuran, berat, ETA, dan shipping fee. Tidak semua kendaraan harus dimuat: program mencari kombinasi kendaraan beserta penempatannya agar **total shipping fee kendaraan yang diangkut sebesar mungkin**.
+
+Susunan kendaraan harus memenuhi tiga constraint:
+
+1. Kendaraan tidak saling bertumpang tindih.
+2. Seluruh bagian kendaraan yang dimuat berada di dalam geladak.
+3. Total berat kendaraan yang dimuat tidak melebihi kapasitas kapal.
+
+Aplikasi menyediakan editor konfigurasi, visualisasi kapal dan kendaraan dalam 2D/3D, grafik pencarian, penyimpanan hasil, serta berkas input/output untuk eksperimen. Hasil local search tidak selalu merupakan optimum global.
 
 ## Anggota dan pembagian tugas
 
@@ -12,57 +22,89 @@ Aplikasi ini mencari susunan kendaraan pada geladak kapal untuk memaksimalkan to
 | 18224093 | Implementasi Simulated Annealing |
 | 18224107 | Implementasi Genetic Algorithm |
 
-## Struktur repository
+## Cara kerja
+
+1. **Menentukan input.** Pengguna mengisi dimensi dan kapasitas kapal, daftar kendaraan, objective mode, serta parameter algoritma. Input juga dapat dimuat dari file JSON eksperimen.
+2. **Membentuk initial state.** Backend mengacak urutan, orientasi, dan koordinat penempatan berdasarkan seed. Kendaraan yang tidak berhasil ditempatkan tetap berada di luar kapal.
+3. **Menjalankan pencarian.** Algoritma mengevaluasi susunan yang valid dan memilih perubahan berdasarkan strategi masing-masing.
+4. **Memvisualisasikan proses.** Frontend menampilkan penempatan kendaraan, perkembangan objective, dan metrik pencarian. HC dan SA mengirim perkembangan melalui WebSocket; GA menggunakan background job yang dipantau frontend.
+5. **Menyimpan hasil.** Run yang selesai otomatis disimpan ke MongoDB. Jika opsi **Save results to output/** dicentang, backend juga membuat berkas JSON dan grafik SVG.
+6. **Mengevaluasi hasil.** Pengguna dapat membandingkan initial/final arrangement, objective akhir, durasi, dan metrik khusus algoritma.
+
+### Representasi state dan neighbor
+
+State merupakan daftar kendaraan yang dimuat beserta ID, koordinat `(x, y)`, panjang, dan lebar setelah orientasi diterapkan. Kendaraan yang tidak tercantum dianggap berada di luar kapal. Koordinat menggunakan grid bilangan bulat dengan titik asal di kiri atas; sumbu X mengikuti lebar dan sumbu Y mengikuti panjang kapal.
+
+Untuk HC, neighbor mencakup perpindahan ke koordinat lain, rotasi, pemindahan keluar kapal, pemasukan kendaraan, serta pertukaran dua kendaraan di dalam atau penggantian kendaraan di dalam dengan kendaraan di luar. Pertukaran dua kendaraan yang sama-sama di luar dilewati karena tidak mengubah state. Hanya perubahan yang memenuhi constraint yang dievaluasi.
+
+### Algoritma yang tersedia
+
+| Algoritma | Strategi pencarian |
+| --- | --- |
+| Steepest Ascent HC | Memeriksa seluruh neighbor valid dan memilih peningkatan objective terbesar. Berhenti jika tidak ada peningkatan atau batas iterasi tercapai. |
+| Stochastic HC | Memilih secara acak neighbor yang meningkatkan objective, dengan peluang sebanding dengan besar peningkatannya. |
+| Sideways HC | Mengutamakan peningkatan terbaik; jika tidak tersedia, dapat menerima state berbeda dengan skor sama sampai batas sideways berturut-turut. |
+| Random Restart HC | Mengulang Steepest Ascent dari state awal acak dan mengembalikan solusi terbaik seluruh percobaan. |
+| Simulated Annealing | Dapat menerima penurunan objective berdasarkan probabilitas dan suhu yang menurun selama pencarian. |
+| Genetic Algorithm | Mengembangkan populasi susunan melalui seleksi, crossover, mutasi, dan elitisme. |
+
+Pada Sideways, perbaikan skor mereset hitungan sideways berturut-turut. Pada Random Restart, `max_restart` menghitung restart di luar percobaan pertama dan `max_iterations` merupakan anggaran total seluruh percobaan. SA menggunakan `stuck_count` sebagai jumlah episode stagnasi tanpa best objective baru selama stagnation window, bukan pembuktian local optimum.
+
+### Objective function
+
+**Shipping fee (wajib, default):** jumlah shipping fee seluruh kendaraan yang dimuat. Semua eksperimen yang disertakan menggunakan mode ini.
+
+**ETA priority (bonus):** menggunakan ETA saja, tanpa shipping fee:
 
 ```text
-src/backend/    Algoritma Python, FastAPI, penyimpanan, dan pengujian
-src/frontend/   Antarmuka React/TypeScript dan visualisasi Three.js
-input/          Config, 33 request eksperimen, state awal, dan indeks input-output
-output/         Hasil run, ringkasan metrik, grafik SVG, dan experiments.csv
-docs/           Lokasi laporan PDF dan lampiran tugas
+score = sum(maximum ETA seluruh config + 1 - ETA kendaraan yang dimuat)
 ```
 
-Laporan PDF belum tersedia di `docs/`. Berkas eksperimen tidak menggantikan analisis, laporan, referensi, atau Form Penggunaan Generative AI.
+ETA lebih kecil memberi poin lebih tinggi. Seluruh kontribusi positif dan kapal kosong mendapat skor 0. Mode ini memaksimalkan total poin prioritas, bukan meminimalkan rata-rata ETA. Pilih **Objective mode → ETA priority (bonus)** pada Configuration. Mode tersedia untuk HC, SA, dan GA; constraint penempatan tetap sama. Perbandingan same-config tidak mencampur objective mode yang berbeda.
 
-## Stack
+## Teknologi dan kebutuhan
 
-- Backend: FastAPI (Python 3.12+), managed with uv
-- Frontend: React + TypeScript, built with Vite (Node.js 22.12+)
+- **Backend:** Python 3.12+, uv, FastAPI.
+- **Frontend:** Node.js 22.12+, npm, React, TypeScript, Vite, Three.js.
+- **Database:** MongoDB; konfigurasi development tersedia melalui Docker Compose.
 
-## Development
+Docker hanya digunakan untuk MongoDB, bukan untuk menjalankan frontend/backend. MongoDB lokal atau layanan eksternal dapat digunakan dengan menyesuaikan `MONGODB_URI`. Penyelesaian run melalui web memerlukan database untuk menyimpan hasil. Editing dan preview config dapat digunakan tanpa database.
 
-Run each server in a separate terminal from the repository root.
+## Setup dan menjalankan aplikasi
 
-### MongoDB
+Jalankan perintah berikut dari root repository. Gunakan terminal terpisah untuk backend dan frontend.
 
-MongoDB runs in Docker while the backend and frontend stay local:
+### 1. Jalankan MongoDB
 
 ```bash
 docker compose up -d mongodb
 ```
 
-The database is available from local applications at `mongodb://devroot:devrootpassword@localhost:27017/?authSource=admin`.
-The data persists in the `mongodb_data` Docker volume. Stop the container with:
+Konfigurasi development menggunakan database di `localhost:27017`, username `devroot`, dan password `devrootpassword`. Kredensial ini hanya untuk development; jangan mengekspos MongoDB dengan kredensial default ke internet. Username, password, dan host port dapat diubah melalui `MONGO_ROOT_USERNAME`, `MONGO_ROOT_PASSWORD`, dan `MONGO_PORT` pada `.env` root. Sesuaikan juga URI backend jika nilainya diubah.
 
-```bash
-docker compose down
-```
+Data tersimpan pada volume `mongodb_data`. `docker compose down` menghentikan container tanpa menghapus volume; **`docker compose down -v` juga menghapus data database**.
 
-To remove the database data as well, use `docker compose down -v`. Credentials and the host port can be overridden in a root `.env` file with `MONGO_ROOT_USERNAME`, `MONGO_ROOT_PASSWORD`, and `MONGO_PORT`.
-
-### Backend
+### 2. Jalankan backend
 
 ```bash
 cd src/backend
-# Preserve an existing environment file; copy defaults on first setup only.
 [ -f .env ] || cp .env.example .env
 uv sync
 uv run fastapi dev main.py
 ```
 
-API: http://127.0.0.1:8000 | Interactive docs: http://127.0.0.1:8000/docs
+Backend: <http://127.0.0.1:8000>. Dokumentasi HTTP API: <http://127.0.0.1:8000/docs>.
 
-### Frontend
+Pengaturan koneksi pada `src/backend/.env`:
+
+```dotenv
+MONGODB_URI=mongodb://devroot:devrootpassword@localhost:27017/?authSource=admin
+MONGODB_DATABASE=ship_optimizer
+```
+
+### 3. Jalankan frontend
+
+Dari terminal lain di root repository:
 
 ```bash
 cd src/frontend
@@ -70,92 +112,80 @@ npm ci
 npm run dev
 ```
 
-Open the URL printed by Vite (usually http://localhost:5173). The scenario editor supports ship settings, a vehicle count with configurable random ranges (length, width, weight, shipping fee, and ETA), individual vehicle edits, an initial-arrangement grid preview, and saving/loading the main config. Generate creates unplaced vehicles; regenerating asks before replacing existing edits. Saving preserves the generated vehicles, not the generation controls. Start MongoDB and the backend to use save/load; editing and previewing work locally. The **Use custom starting positions** toggle is saved with the config as `preserve_positions`. Off (default) randomizes all positions and disables X/Y editing; on preserves filled X/Y pairs and randomizes vehicles without positions. Turning it off retains custom coordinates for later, but ignores them in the preview and initializer. The config page contains configuration only. Use **Next: Optimization** to open the separate optimization page and choose HC, SA, or GA; **Back to config** preserves the current draft and generation controls.
+Buka URL yang ditampilkan Vite, biasanya <http://localhost:5173>. Vite meneruskan HTTP/WebSocket `/api` ke backend di `http://127.0.0.1:8000`.
 
-Vite proxies HTTP and WebSocket `/api` requests to `http://127.0.0.1:8000`, so no development CORS configuration is needed.
+## Menggunakan aplikasi
 
-## Saving and exporting results
+### Configuration
 
-To replay an experiment in the web UI, click **Import experiment JSON** and choose a file from `input/requests/`. It restores the config, algorithm/variant, seed, parameters, and output/demo options without starting a run or overwriting the saved MongoDB config. Review the fields and click Run. Importing `input/config.json` restores only the configuration. Imports are disabled during an active run, and replacing an edited draft requires confirmation.
+1. Atur ukuran dan kapasitas kapal.
+2. Tambahkan kendaraan secara manual atau gunakan generator dengan rentang ukuran, berat, shipping fee, dan ETA.
+3. Pilih objective mode. Gunakan **Shipping fee** untuk eksperimen wajib.
+4. Biarkan **Use custom starting positions** nonaktif untuk inisialisasi acak. Jika aktif, pasangan X/Y yang sudah diisi dipertahankan dan kendaraan tanpa posisi tetap diacak.
+5. **Save config** menyimpan konfigurasi utama; **Load saved** memuatnya kembali. Menjalankan algoritma tidak mewajibkan penyimpanan config terlebih dahulu dan tidak menimpa config utama.
+6. Klik **Next: Optimization**.
 
-Completed web runs for HC, SA, and GA automatically save to MongoDB. SA's single-run and three-experiment actions report completion only after storage succeeds; database failures are shown as errors. The standalone SA experiment CLI remains available without MongoDB.
+### Optimization
 
-- HC: download the selected run as JSON.
-- SA: export all runs in the current experiment batch as JSON.
-- GA: saved history and replay are available.
+1. Pilih HC, SA, atau GA. Untuk HC, pilih juga variannya.
+2. Atur seed dan parameter pencarian.
+3. Centang **Save results to output/** jika membutuhkan berkas hasil untuk laporan.
+4. Klik tombol Run dan tunggu pencarian serta penyimpanan selesai.
+5. Periksa state awal/akhir, grafik, objective, durasi, dan metrik pencarian. SA juga menyediakan **Run 3 experiments** dengan seed berurutan.
 
-For any algorithm, enable **Save results to output/** before running. Completed runs also write to `output/<algorithm>/<run-id>/`:
+Pada HC, **Show every neighbor** nonaktif secara default. Jika diaktifkan, setiap neighbor valid ditampilkan berurutan tanpa melewati frame; neighborhood besar dapat membuat visualisasi lama. Kontrol **Slower/Faster** mengatur playback 0,25×-8× tanpa mengubah keputusan pencarian. **Compare iteration** menampilkan state sebelum/sesudah iterasi; replay ini hanya disimpan selama sesi halaman, bukan dalam JSON run HC.
 
-- `summary.json`: seed, objective mode/unit, parameters, scores, duration, iteration/generation counts, and applicable sideways/restart/stagnation metrics.
-- `run.json`: full config, initial/final states, histories, and replay data when recorded.
-- `initial.svg`, `final.svg`: deck arrangement and unloaded vehicles.
-- `objective.svg`: objective history; GA includes population maximum and average.
-- SA additionally writes `exponential.svg`. If the raw exponential overflows, the graph explicitly uses its natural logarithm. JSON retains finite raw exponentials and `log_acceptance`; overflowed raw exponentials are `null`.
+Pada GA, **Rekam proses untuk demo** berbeda dari ekspor hasil. Demo dibatasi maksimum 10 individu, 10 generasi, dan 30 kendaraan. Matikan opsi demo untuk mengulang konfigurasi eksperimen GA yang disertakan.
 
-Files are generated by the backend in this repository, not in the browser Downloads folder. MongoDB auto-save remains enabled independently of the checkbox. Failed/cancelled searches do not generate report bundles; completed bundles are published only after all their files have been written. SA's `stuck_count` counts stagnation-window episodes, not proven local optima.
+### Results dan riwayat
 
-## Bonus objective: ETA priority
+Halaman **Results** menampilkan satu run HC beserta dua grid initial/final, grafik, metrik, dan ekspor JSON. **Compare with** menambahkan pembanding dengan config hash yang sama tanpa mengganti run utama. SA dan GA memiliki hasil/riwayat pada panel masing-masing di Optimization; SA juga menyediakan ekspor JSON seluruh batch.
 
-On the Config page, select **Objective mode → ETA priority (bonus)**. This mode uses **ETA only**, not shipping fees:
+Navigasi antarhalaman mempertahankan draft dan pengaturan selama sesi. Draft yang belum disimpan tidak bertahan setelah browser di-refresh.
+
+## Mengulang eksperimen dari input
+
+1. Klik **Import JSON**.
+2. Pilih satu file dari `input/requests/`.
+3. Config, algoritma/varian, seed, parameter, dan opsi output/demo akan terisi sesuai file.
+4. Tinjau pengaturan lalu klik Run. Import tidak otomatis menjalankan pencarian atau menimpa config MongoDB.
+
+Pilih `input/config.json` jika hanya ingin memuat konfigurasi tanpa mengganti parameter algoritma. Import dinonaktifkan selama run aktif; penggantian draft yang telah diedit memerlukan konfirmasi. Field tetap dapat diedit setelah import, sehingga perubahan manual dapat menghasilkan eksperimen berbeda.
+
+Config, seed, parameter, serta versi kode/dependensi yang sama diharapkan menghasilkan keputusan pencarian yang sama. Durasi, timestamp, dan run ID dapat berbeda. Pengulangan seluruh 33 run untuk memverifikasi determinisme belum dilakukan.
+
+## Input, output, dan eksperimen
 
 ```text
-score = sum(maximum ETA in the config + 1 - vehicle ETA) for loaded vehicles
+input/
+  config.json          Konfigurasi bersama seluruh eksperimen
+  requests/            33 request JSON, satu untuk setiap run
+  initial_states/      State awal HC/SA untuk seed 42, 43, dan 44
+  experiments.json     Pemetaan request, run ID, dan folder output
+  README.md            Penjelasan parameter dan cara menjalankan ulang
+output/
+  experiments.csv      Rekap metrik seluruh 33 run
+  <algorithm>/
+    <run-id>/          Hasil lengkap satu run
 ```
 
-Smaller ETA earns more points; all contributions are positive, so an empty ship does not win simply by loading nothing. This maximizes total loaded urgency, not the average/minimum ETA. HC (all variants), SA, GA, replay, saved snapshots, and charts use the selected mode. ETA scores are labeled **ETA priority points**, never monetary revenue. **Shipping fee (required)** remains the default for mandatory experiments. Different objective modes produce different config hashes and are not mixed in same-config comparisons; existing fee-mode hashes remain compatible.
+Setiap folder run berisi:
 
-## Running Hill Climbing
+| Berkas | Isi |
+| --- | --- |
+| `summary.json` | Parameter, seed, objective mode/unit, skor, durasi, iterasi/generasi, dan metrik khusus algoritma. |
+| `run.json` | Config, initial/final arrangement, objective history, dan data tambahan yang direkam. |
+| `initial.svg`, `final.svg` | Susunan kendaraan pada kapal dan daftar kendaraan di luar kapal. |
+| `objective.svg` | Grafik objective terhadap iterasi; GA menampilkan maksimum dan rata-rata populasi terhadap generasi. |
+| `exponential.svg` | Khusus SA: grafik eksponensial. Jika overflow, grafik diberi keterangan bahwa yang ditampilkan adalah logaritma naturalnya. |
 
-1. Configure or load a scenario and add vehicles on `/#config`.
-2. Click **Next: Optimization**. Invalid or incomplete config fields must be corrected before continuing.
-3. On `/#optimization`, select **Hill Climbing** under Algorithm, then choose **Steepest Ascent**, **Stochastic**, **Sideways Move**, or **Random Restart**. Set **Random seed** and **Max iterations** (1-10,000). Sideways exposes **Max sideways moves**; Random Restart exposes **Max restarts**, with the iteration budget shared across all attempts. Click the selected variant's Run button. The backend executes the current draft snapshot and saves the completed run in MongoDB. Saving the main config first is not required, and running does not overwrite it.
-4. **Show every neighbor** is off by default: the scene moves directly to each completed iteration's chosen state, without best-so-far previews. Enable it to display each valid neighbor in order, without sampling or dropped frames. Amber wireframes identify the changed vehicles; the card shows the neighbor number, action, score, and whether it improves or ties the current/best score. Rejected previews never update the committed state or graph.
-5. Use **Slower** / **Faster** to change visualization speed from **0.25× to 8×**, including during a run. Vehicle transitions follow the same speed. Large neighborhoods take time to display; speed changes do not change search decisions. Reduced-motion mode disables interpolated movement, not individual neighbor previews.
-6. Use **Stop search** to cancel active work and pending playback. Disconnecting also cancels active computation. Partial runs are not saved; a run already saved before a disconnect remains stored.
-7. Review objective values, search duration, iteration count, loaded/unloaded counts, and the objective graph. **Initial state** / **Current state** are available during execution, then **Initial state** / **Final state** after completion. **Draft** shows the editor preview. **Download JSON** exports completed, saved runs.
+Buka SVG menggunakan browser. Berkas dibuat oleh backend pada repository, bukan pada folder Downloads browser. MongoDB auto-save tetap aktif meskipun checkbox ekspor tidak dicentang. Satu bundle dipublikasikan setelah seluruh berkasnya berhasil ditulis; bila ekspor gagal setelah database berhasil disimpan, aplikasi melaporkan kegagalannya. Run parsial tidak dibuat menjadi bundle hasil.
 
-After optimization, use **Next: Results** to inspect **one run**: initial/final states, objective history, duration, iterations, and JSON export. Initial and final arrangements each have their own grid, shown together (stacked on small screens); the initial/final buttons independently control the 3D ship view. **Compare with** optionally adds one other MongoDB run with the exact same config hash to a side-by-side metrics table; it never replaces the primary result or ship view. Results is not an all-run history page.
+JSON SA menyimpan nilai eksponensial yang finite dan `log_acceptance`; nilai eksponensial yang overflow direpresentasikan sebagai `null`.
 
-**Compare iteration** lets you revisit any completed scan, toggle **Before iteration** / **After iteration** in the 3D and grid views, and inspect the objective delta. No-improvement scans show identical states. This replay is captured from the live stream and retained for the current page session, including after completion or cancellation; saved run JSON still contains the initial/final arrangements and objective history, not per-iteration placements.
+### Eksperimen yang disertakan
 
-Navigation uses browser history, so Back/Forward work without discarding the in-memory config draft, generator controls, algorithm settings, or completed result. Configuration always shows the draft arrangement, not the run's final state. Unsaved drafts do not survive a full browser refresh; use Save config before reloading.
-
-The non-streaming endpoint remains `POST /api/optimization/hill-climbing`, with `{ "config": { ... }, "random_seed": 42, "iterations": 100 }`. Set `variant` to `steepest_ascent` (default), `stochastic`, `sideways`, or `random_restart`; optional `max_sideways` and `max_restart` configure their limits. Stochastic weights improving neighbors by their score increase. Random Restart returns the best state across attempts and records restart counts plus iterations per attempt.
-
-### WebSocket protocol
-
-Connect to `/api/optimization/hill-climbing/live` on the same host, then send the same execution request as the first JSON message. Add `"show_neighbors": true` to emit every valid neighbor (the API default is false). The frontend also sends `"acknowledge_progress": true` for lossless, paced delivery. One connection runs one search. Browser origins must match the request host.
-
-- `progress`: `phase` (`initial`, `candidate`, `best`, or `iteration`), `iteration`, `arrangement`, `objective`, `current_objective`, `neighbors_evaluated`, and `runtime_ms`. The initial event additionally includes the config snapshot. `candidate` describes a non-winning neighbor; `best` describes a strictly improving best-so-far candidate. Neither commits it. `initial` and `iteration` describe committed states.
-- `complete`: `run`, emitted only after persistence succeeds.
-- `cancelled`: cancellation confirmed, without saving a partial run.
-- `error`: `detail`, for invalid input, execution failure, or persistence failure.
-- Client control message: `{ "type": "cancel" }`.
-- With `acknowledge_progress` enabled, each progress event includes a `sequence` integer. After displaying that frame, send `{ "type": "ack", "sequence": 1 }` with its actual sequence. The server waits before sending the next progress event. Cancellation does not require acknowledging a pending frame.
-
-CPU search runs off the event loop. A bounded queue plus per-frame acknowledgements prevent unbounded buffering without dropping neighbors; visualization waits are excluded from reported search time. Backpressure may pause the worker while the viewer catches up, and cancellation is checked during initialization, neighborhood enumeration, scoring, and before persistence. The existing HTTP endpoint uses the same algorithm without streaming.
-
-The search rule remains strict Steepest Ascent: scan all valid neighbors, accept the highest objective only if it improves the current state, and stop at a local optimum or the requested iteration limit. Each iteration is one complete neighborhood scan, including the final no-improvement scan. Search time excludes database access, initial-state generation, and progress callback/delivery time. Large fleets/decks can be expensive because enumeration is exhaustive.
-
-New execution results store the actual initial/final placements and search metrics. Older manually saved runs can have null metadata rather than fabricated initial states.
-
-## Search foundation and assignment status
-
-The shared Python foundation supports rectangle validation, shipping-fee scoring, seeded random initialization, and the required swap/move/orientation neighbor categories.
-
-- Assignment runs use fully random initial positions by default. `prepare_run()` follows the saved config's `preserve_positions` toggle; an explicit `preserve_positions=True/False` argument can override it for a run. Custom-start mode is not the default experiment mode.
-- Moves can choose any fitting deck coordinate, not just an adjacent cell. Moving outside the ship unloads a vehicle.
-- Swaps exchange two loaded vehicles' anchors, or atomically replace a loaded vehicle with an unloaded one. Dimensions/orientation are retained for loaded vehicles and the whole result is validated.
-- Outside vehicles have no stored coordinates in the placement-list representation. Two unloaded vehicles swapping is therefore unchanged and skipped. An unloaded vehicle's orientation is chosen when entering the deck.
-- `prepare_run()` prepares a saved-config starting state; `prepare_config()` prepares an immutable request snapshot. The execution service passes that snapshot to the pure `steepest_ascent()` search and persists the result.
-
-All four HC variants are available through the API and FE. Results label the actual variant, include sideways/restart metrics when applicable, and compare variants only across identical config snapshots. SA and GA have their own panels in the Algorithm selector, including their experiment plots.
-
-### Eksperimen yang sudah dijalankan
-
-Sebanyak **33 run** tersimpan di `output/`, dengan input masing-masing di `input/requests/` dan pemetaan run ID di `input/experiments.json`. Rekap lintas run tersedia di `output/experiments.csv`.
-
-Semua memakai kapal berukuran 10 x 20, kapasitas berat 10.000, daftar 10 kendaraan yang sama, objective **shipping fee**, dan custom starting positions nonaktif. Seed 42, 43, dan 44 digunakan pada setiap varian/konfigurasi. Untuk seed yang sama, state awal keempat varian HC dan SA telah diperiksa identik; state antar-seed berbeda. GA menggunakan populasi susunan acak dan melaporkan individu terbaik dari populasi awal sebagai initial arrangement.
+Sebanyak **33 run** telah dijalankan dengan konfigurasi bersama: geladak **10 × 20**, kapasitas berat **10.000**, **10 kendaraan**, objective **Shipping fee**, dan custom starting positions nonaktif. Setiap varian/konfigurasi menggunakan seed **42, 43, 44**. Initial state semua varian HC dan SA telah diperiksa identik untuk seed yang sama; GA menggunakan populasi dan melaporkan individu terbaik populasi awal.
 
 | Algoritma/kelompok | Parameter | Run |
 | --- | --- | ---: |
@@ -168,24 +198,46 @@ Semua memakai kapal berukuran 10 x 20, kapasitas berat 10.000, daftar 10 kendara
 | GA: iterasi tetap | Iterasi 100; populasi 10, 20, 40; masing-masing 3 run | 9 |
 | **Total** | | **33** |
 
-GA menggunakan crossover rate 0,8 dan mutation rate 0,3; demo recording nonaktif. Parameter lengkap tersimpan pada request dan summary setiap run. Buka SVG lewat browser untuk melihat gambar dan grafik.
+GA menggunakan crossover rate **0,8**, mutation rate **0,3**, dan demo recording nonaktif. Eksperimen bonus objective ETA tidak termasuk dalam 33 run ini.
 
-### Catatan interpretasi dan pengumpulan
+## Struktur source code
 
-- Sideways membatasi gerakan sama-skor **berturut-turut**; perbaikan skor mereset hitungan. Cocokkan interpretasi ini dengan salindia/asisten karena spesifikasi tidak menjelaskan reset.
-- SA `stuck_count` menghitung episode tanpa best objective baru selama stagnation window, bukan pembuktian local optimum. Jelaskan definisinya dalam analisis.
-- Config, seed, dan parameter disimpan agar eksperimen dapat dijalankan ulang. Mengimpor file tidak mengunci field: perubahan manual dapat mengubah hasil. Pengulangan seluruh 33 run untuk memverifikasi determinisme belum dilakukan; durasi, timestamp, dan run ID memang dapat berbeda.
-- Bandingkan skor akhir, durasi, konsistensi tiga pengulangan, serta pengaruh populasi/iterasi GA. Jangan menyimpulkan global optimum tanpa dasar pembanding atau pembuktian.
-- Laporan PDF di `docs/` harus mencakup cover, deskripsi persoalan, implementasi algoritma, hasil dan analisis beserta visualisasi, kesimpulan/saran, pembagian tugas, referensi, serta Form Penggunaan Generative AI yang diisi jujur.
-- Sebelum pengumpulan, lengkapi pembagian tugas README, commit/push sumber beserta `input/` dan `output/`, pastikan repository public, dan buat release dengan tag **`vX.Y`** sesuai milestone/revisi.
+```text
+src/backend/
+  algorithms/    Algoritma pencarian, initializer, objective, dan validasi
+  api/           HTTP API dan WebSocket
+  models/        Model config, run, dan job
+  dtos/          Model request API
+  services/      Eksekusi, penyimpanan, background job, dan ekspor hasil
+  repository/    Akses MongoDB
+  tests/         Pengujian backend
+src/frontend/
+  src/           Editor, panel algoritma, visualisasi, dan API client
+  tests/         Pengujian frontend
+input/           Data input eksperimen
+output/          Hasil eksperimen
+ docs/           Lokasi laporan PDF dan lampiran
+```
 
-## Checks
+## Pengujian
+
+Jalankan pemeriksaan sesuai bagian yang diubah. Pemeriksaan lengkap:
 
 ```bash
 (cd src/backend && uv run ruff format --check . && uv run ruff check . && uv run basedpyright && uv run pytest)
 (cd src/frontend && npm run format:check && npm run lint && npm run typecheck && npm test && npm run build)
 ```
 
-Backend application modules use strict type checking; tests use standard checking to accommodate dynamic mocks. Apply formatting with `uv run ruff format .` in `src/backend` and `npm run format` in `src/frontend`.
+### API dan deployment
 
-For production, serve `src/frontend/dist` with a static web server and route `/api` to the FastAPI service, including WebSocket upgrade support and the original Host header. Vite's development proxy does not apply to production builds. Run the backend with `uv run fastapi run main.py` from `src/backend`.
+Request yang dapat dijalankan ulang tersedia dalam `input/requests/`. Endpoint utama: `POST /api/optimization/hill-climbing`, `POST /api/search/simulated-annealing`, dan `POST /api/jobs` untuk GA. Implementasi protokol live tersedia di [`api/optimization.py`](src/backend/api/optimization.py) dan [`api/search.py`](src/backend/api/search.py). HC memakai ACK per frame untuk pacing tanpa membuang neighbor; browser origin harus sesuai request host. Koneksi yang terputus membatalkan pekerjaan HC/SA yang masih berjalan, tetapi hasil yang sudah tersimpan tidak dihapus.
+
+Untuk production, build frontend dengan `npm run build`, sajikan `src/frontend/dist` melalui static web server, dan teruskan `/api` ke backend termasuk WebSocket serta Host header asli. Jalankan backend dari `src/backend` dengan `uv run fastapi run main.py`. Proxy development Vite tidak berlaku pada build production.
+
+## Catatan laporan dan pengumpulan
+
+- Sideways memakai batas **berturut-turut** yang direset oleh peningkatan skor. Cocokkan interpretasinya dengan salindia/asisten karena spesifikasi tidak menjelaskan reset.
+- Jelaskan definisi stagnasi SA saat menggunakan `stuck_count` sebagai indikator stuck.
+- Laporan PDF ditempatkan di `docs/`, mencakup deskripsi persoalan, implementasi beserta source code, hasil dan analisis eksperimen, kesimpulan/saran, pembagian tugas, referensi, serta Form Penggunaan Generative AI yang diisi jujur.
+- Data JSON dan grafik tidak menggantikan analisis laporan. Bandingkan kualitas solusi, durasi, konsistensi pengulangan, dan pengaruh parameter GA; jangan mengklaim optimum global tanpa dasar pembuktian.
+- Commit/push source beserta input/output, pastikan repository public, dan buat release bertag **`vX.Y`** sesuai ketentuan tugas.
