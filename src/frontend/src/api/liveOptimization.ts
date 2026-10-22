@@ -16,7 +16,9 @@ export function executeHillClimbingLive(
   onProgress: (live: LiveRun) => void | Promise<void>,
   signal: AbortSignal,
   showNeighbors = false,
-  settings: Pick<SteepestAscentRun['settings'], 'variant' | 'max_sideways' | 'max_restart'> = { variant: 'steepest_ascent' }
+  settings: Pick<SteepestAscentRun['settings'], 'variant' | 'max_sideways' | 'max_restart'> & {
+    save_to_output?: boolean
+  } = { variant: 'steepest_ascent' }
 ): Promise<SteepestAscentRun> {
   if (signal.aborted) return Promise.reject(new RunCancelledError())
   const payload = JSON.stringify({

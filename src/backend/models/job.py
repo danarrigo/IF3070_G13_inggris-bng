@@ -17,6 +17,7 @@ class StartJobRequest(BaseModel):
     settings: GeneticAlgorithmSettings
     random_seed: int
     record_demo: bool = False
+    save_to_output: bool = False
 
     @model_validator(mode="after")
     def check_demo_size(self):

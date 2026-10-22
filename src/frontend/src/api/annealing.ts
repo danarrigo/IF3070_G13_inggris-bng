@@ -20,7 +20,8 @@ export function streamAnnealing(
   seed: number,
   count: 1 | 3,
   onProgress: (index: number, snapshot: Snapshot) => void,
-  signal: AbortSignal
+  signal: AbortSignal,
+  saveToOutput = false
 ): Promise<SearchRun[]> {
   return new Promise((resolve, reject) => {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
@@ -44,7 +45,15 @@ export function streamAnnealing(
       return
     }
     socket.onopen = () =>
-      socket.send(JSON.stringify({ config, settings, random_seed: seed, run_count: count }))
+      socket.send(
+        JSON.stringify({
+          config,
+          settings,
+          random_seed: seed,
+          run_count: count,
+          save_to_output: saveToOutput,
+        })
+      )
     socket.onmessage = (event) => {
       try {
         const message = JSON.parse(event.data)
@@ -65,16 +74,6 @@ export function streamAnnealing(
       if (!finished) stop(new Error('Search connection closed before completion.'))
     }
   })
-}
-
-export async function saveRun(run: SearchRun): Promise<SearchRun> {
-  return (await read(
-    await fetch('/api/runs', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(run),
-    })
-  )) as SearchRun
 }
 
 export async function loadAnnealingRuns(): Promise<SearchRun[]> {

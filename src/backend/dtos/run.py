@@ -25,3 +25,4 @@ class AnnealingRequest(BaseModel):
     settings: SimulatedAnnealingSettings
     random_seed: int = Field(default=42, ge=0, le=2**32 - 4)
     run_count: Literal[1, 3] = 1
+    save_to_output: bool = False

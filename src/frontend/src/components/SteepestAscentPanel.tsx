@@ -58,6 +58,8 @@ function SteepestAscentPanel({
   const [maxRestart, setMaxRestart] = useState<number | null>(10)
   const [running, setRunning] = useState(false)
   const [showNeighbors, setShowNeighbors] = useState(false)
+  const [saveToOutput, setSaveToOutput] = useState(false)
+  const [outputRunId, setOutputRunId] = useState<string | null>(null)
   const [cancelling, setCancelling] = useState(false)
   const [cancelled, setCancelled] = useState(false)
   const [error, setError] = useState('')
@@ -93,6 +95,7 @@ function SteepestAscentPanel({
     controllerRef.current = controller
     setCancelling(false)
     setCancelled(false)
+    setOutputRunId(null)
     setRunning(true)
     onRunningChange(true)
     onStart()
@@ -112,10 +115,18 @@ function SteepestAscentPanel({
         },
         controller.signal,
         showNeighbors,
-        { variant, max_sideways: maxSideways ?? 100, max_restart: maxRestart ?? 10 }
+        {
+          variant,
+          max_sideways: maxSideways ?? 100,
+          max_restart: maxRestart ?? 10,
+          save_to_output: saveToOutput,
+        }
       )
       await playback.drain()
-      if (mounted.current) onComplete(completed)
+      if (mounted.current) {
+        onComplete(completed)
+        setOutputRunId(saveToOutput ? completed.id : null)
+      }
     } catch (cause) {
       playback.dispose()
       if (mounted.current) {
@@ -267,6 +278,17 @@ function SteepestAscentPanel({
           <label className="neighbor-exploration">
             <input
               type="checkbox"
+              checked={saveToOutput}
+              onChange={(event) => setSaveToOutput(event.target.checked)}
+            />
+            <span>
+              Save results to output/
+              <small>JSON metrics, initial/final SVGs, and objective chart.</small>
+            </span>
+          </label>
+          <label className="neighbor-exploration">
+            <input
+              type="checkbox"
               checked={showNeighbors}
               onChange={(event) => setShowNeighbors(event.target.checked)}
             />
@@ -328,6 +350,11 @@ function SteepestAscentPanel({
             : live
               ? `Live visualization: ${live.neighbors_evaluated} neighbors evaluated, ${live.iteration} scans completed.`
               : 'Connecting and generating the initial state...'}
+        </p>
+      )}
+      {outputRunId && run?.id === outputRunId && (
+        <p role="status" className="field-hint">
+          Files saved: output/hill_climbing/{outputRunId}/
         </p>
       )}
       {cancelled && (

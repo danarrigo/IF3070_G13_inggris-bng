@@ -14,6 +14,7 @@ from algorithms.initialization import initialize_arrangement
 from models.job import JobState, StartJobRequest
 from models.run import PopulationPoint, RunModel, VehiclePlacement
 from repository.run_repository import insert_run
+from services.output_service import OutputExportError, export_run
 from services.run_service import hash_config
 
 logger = logging.getLogger(__name__)
@@ -132,6 +133,8 @@ class JobManager:
                     raise SearchCancelled()
                 job.stage = "saving"
             insert_run(db, run)
+            if request.save_to_output:
+                _ = export_run(run)
             with self._lock:
                 job.run = run
                 job.status = "completed"
@@ -140,6 +143,12 @@ class JobManager:
             with self._lock:
                 job.status = "cancelled"
                 job.stage = "cancelled"
+        except OutputExportError:
+            logger.exception("GA output export %s failed", job_id)
+            with self._lock:
+                job.status = "failed"
+                job.stage = "failed"
+                job.error = "Run saved in MongoDB, but writing output files failed. Check the backend logs and output directory permissions."
         except Exception:
             logger.exception("GA job %s failed", job_id)
             with self._lock:

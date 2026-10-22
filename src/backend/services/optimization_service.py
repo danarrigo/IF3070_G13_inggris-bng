@@ -7,6 +7,7 @@ from algorithms.hill_climbing import SearchProgress, run_hill_climbing
 from dtos.optimization import HillClimbingRequest
 from models.run import HillClimbingSettings, RunModel
 from repository.run_repository import insert_run
+from services.output_service import export_run
 from services.run_service import prepare_config
 
 
@@ -47,4 +48,6 @@ def execute_hill_climbing(
     )
     check_cancellation(should_cancel)
     _ = insert_run(db, run)
+    if request.save_to_output:
+        _ = export_run(run)
     return run

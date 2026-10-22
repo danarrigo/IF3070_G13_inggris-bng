@@ -162,6 +162,7 @@ export interface JobRequest {
   settings: GASettings
   random_seed: number
   record_demo?: boolean
+  save_to_output?: boolean
 }
 
 export interface DemoIndividual {

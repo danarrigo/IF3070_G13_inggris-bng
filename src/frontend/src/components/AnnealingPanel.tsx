@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { streamAnnealing, loadAnnealingRuns, saveRun } from '../api/annealing'
+import { streamAnnealing, loadAnnealingRuns } from '../api/annealing'
 import type { Config } from '../types/config'
 import { arrangementConfig } from '../types/run'
 import { vehicleColor } from './runView'
@@ -131,6 +131,7 @@ export default function AnnealingPanel({
     stagnation_window: 100,
   })
   const [seed, setSeed] = useState(42)
+  const [saveToOutput, setSaveToOutput] = useState(false)
   const [runs, setRuns] = useState<SearchRun[]>([])
   const [selected, setSelected] = useState(0)
   const [frame, setFrame] = useState(0)
@@ -214,14 +215,15 @@ export default function AnnealingPanel({
           )
           onPreview(arrangementConfig(config, snapshot.arrangement))
         },
-        controller.current.signal
+        controller.current.signal,
+        saveToOutput
       )
       setRuns(result)
       setSelected(0)
       setFrame(0)
       setView('final')
       setMessage(
-        `${result.length} run(s) completed. Final means best state found; last state is also available.`
+        `${result.length} run(s) completed and automatically saved to MongoDB.${saveToOutput ? ' Files saved under output/simulated_annealing/<run-id>/.' : ''} Final means best state found; last state is also available.`
       )
     })
   }
@@ -290,9 +292,21 @@ export default function AnnealingPanel({
               />
             </label>
           </div>
+          <label className="neighbor-exploration">
+            <input
+              type="checkbox"
+              checked={saveToOutput}
+              onChange={(event) => setSaveToOutput(event.target.checked)}
+            />
+            <span>
+              Save results to output/
+              <small>JSON metrics, initial/final SVGs, and charts for each completed run.</small>
+            </span>
+          </label>
           <p className="field-hint">
             Uses the current draft, up to 200 vehicles. Custom starting positions off: randomize all
-            positions. On: preserve filled X/Y pairs. No MongoDB is needed to compute.
+            positions. On: preserve filled X/Y pairs. Completed runs are automatically saved;
+            MongoDB must be available.
           </p>
           <div className="sa-actions">
             <button type="submit" className="primary">
@@ -401,20 +415,6 @@ export default function AnnealingPanel({
             {run.result.unloaded_vehicle_ids.length}. Config: {run.configHash.slice(0, 12)}.
           </p>
           <div className="sa-actions">
-            <button
-              disabled={busy}
-              onClick={() => {
-                void perform(async () => {
-                  const saved = await saveRun(run)
-                  setRuns((previous) =>
-                    previous.map((item, index) => (index === selected ? saved : item))
-                  )
-                  setMessage('Selected run saved to MongoDB.')
-                })
-              }}
-            >
-              Save selected run
-            </button>
             <button onClick={download}>Export all JSON</button>
             <button
               onClick={() => {

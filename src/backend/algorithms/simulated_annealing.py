@@ -5,6 +5,7 @@ from collections.abc import Callable
 from random import Random
 from time import perf_counter
 
+from algorithms.cancellation import check_cancellation
 from algorithms.initialization import initialize_arrangement
 from algorithms.neighbors import random_neighbor
 from algorithms.objective import calculate_objective
@@ -32,19 +33,23 @@ def simulated_annealing(
     rng: Random,
     initial_arrangement: list[VehiclePlacement] | None = None,
     on_snapshot: Callable[[StateSnapshot], None] | None = None,
+    *,
+    should_cancel: Callable[[], bool] | None = None,
 ) -> RunResult:
+    check_cancellation(should_cancel)
     started = perf_counter()
     observer_seconds = 0.0
 
     def notify(snapshot: StateSnapshot) -> None:
         nonlocal observer_seconds
+        check_cancellation(should_cancel)
         if on_snapshot:
             before = perf_counter()
             on_snapshot(snapshot)
             observer_seconds += perf_counter() - before
 
     current = (
-        initialize_arrangement(config, rng)
+        initialize_arrangement(config, rng, should_cancel=should_cancel)
         if initial_arrangement is None
         else [p.model_copy(deep=True) for p in initial_arrangement]
     )
@@ -64,6 +69,7 @@ def simulated_annealing(
     stagnant, in_stagnation, stuck_count = 0, False, 0
     stop_reason = "iteration_limit"
     for iteration in range(1, settings.iterations + 1):
+        check_cancellation(should_cancel)
         if temperature < settings.minimum_temperature:
             stop_reason = "minimum_temperature"
             break

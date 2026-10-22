@@ -16,6 +16,7 @@ from core.database import DatabaseDep
 from dtos.optimization import HillClimbingRequest
 from models.run import RunModel
 from services.optimization_service import execute_hill_climbing
+from services.output_service import OutputExportError
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -29,6 +30,11 @@ def run_hill_climbing(request: HillClimbingRequest, db: DatabaseDep) -> RunModel
         return execute_hill_climbing(db, request)
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
+    except OutputExportError as exc:
+        logger.exception("HC output export failed")
+        raise HTTPException(
+            500, "Run saved in MongoDB, but writing output files failed."
+        ) from exc
     except PyMongoError as exc:
         raise HTTPException(
             status_code=503, detail="Database unavailable. The run could not be saved."
@@ -108,6 +114,12 @@ async def live_hill_climbing(websocket: WebSocket, db: DatabaseDep) -> None:
             terminal = {"type": "cancelled"}
         except ValueError as exc:
             terminal = {"type": "error", "detail": str(exc)}
+        except OutputExportError:
+            logger.exception("HC output export failed")
+            terminal = {
+                "type": "error",
+                "detail": "Run saved in MongoDB, but writing output files failed.",
+            }
         except PyMongoError:
             terminal = {
                 "type": "error",

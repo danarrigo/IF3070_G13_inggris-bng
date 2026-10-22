@@ -105,6 +105,7 @@ export default function GeneticAlgorithmPanel({
   const [view, setView] = useState<'3d' | '2d'>('3d')
   const [showResult, setShowResult] = useState(true)
   const [recordDemo, setRecordDemo] = useState(false)
+  const [saveToOutput, setSaveToOutput] = useState(false)
   const [replayOpen, setReplayOpen] = useState(false)
   const [loadingResult, setLoadingResult] = useState(false)
   const [stopping, setStopping] = useState(false)
@@ -222,6 +223,7 @@ export default function GeneticAlgorithmPanel({
         settings,
         random_seed: seed,
         record_demo: recordDemo,
+        save_to_output: saveToOutput,
       })
       setStopping(false)
       setDeleteCandidate(null)
@@ -381,6 +383,14 @@ export default function GeneticAlgorithmPanel({
           <label className="demo-option">
             <input
               type="checkbox"
+              checked={saveToOutput}
+              onChange={(event) => setSaveToOutput(event.target.checked)}
+            />
+            Save results to output/ (JSON metrics, initial/final SVGs, maximum/average chart)
+          </label>
+          <label className="demo-option">
+            <input
+              type="checkbox"
               checked={recordDemo}
               onChange={(event) => setRecordDemo(event.target.checked)}
             />
@@ -447,6 +457,9 @@ export default function GeneticAlgorithmPanel({
             </span>
           </div>
           <progress max={total} value={job.generation} aria-label="Generations completed" />
+          {job.status === 'completed' && job.request.save_to_output && job.run?.id === run?.id && (
+            <p className="field-hint">Files saved: output/genetic_algorithm/{job.run?.id}/</p>
+          )}
           {active && (
             <>
               <button
