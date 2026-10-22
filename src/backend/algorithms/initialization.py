@@ -1,5 +1,7 @@
+from collections.abc import Callable
 from random import Random
 
+from algorithms.cancellation import check_cancellation
 from algorithms.validation import (
     placements_overlap,
     validate_arrangement,
@@ -15,6 +17,7 @@ def initialize_arrangement(
     *,
     max_attempts_per_vehicle: int = 100,
     preserve_positions: bool | None = None,
+    should_cancel: Callable[[], bool] | None = None,
 ) -> list[VehiclePlacement]:
     """Generate the assignment's random initial state by default.
 
@@ -23,6 +26,7 @@ def initialize_arrangement(
     that was not sampled. This is an initial solution, not an optimal packing.
     The caller owns the RNG; neither config nor global random state is changed.
     """
+    check_cancellation(should_cancel)
     if max_attempts_per_vehicle <= 0:
         raise ValueError("max_attempts_per_vehicle must be positive.")
     if preserve_positions is None:
@@ -39,6 +43,7 @@ def initialize_arrangement(
     pending: list[Vehicle] = []
     total_weight = 0
     for vehicle in config.vehicles:
+        check_cancellation(should_cancel)
         if preserve_positions and vehicle.x is not None and vehicle.y is not None:
             placements.append(
                 VehiclePlacement(
@@ -54,6 +59,7 @@ def initialize_arrangement(
             pending.append(vehicle)
     rng.shuffle(pending)
     for vehicle in pending:
+        check_cancellation(should_cancel)
         if total_weight + vehicle.weight > config.ship.max_weight:
             continue
         orientations = [(vehicle.length, vehicle.width)]
@@ -67,6 +73,7 @@ def initialize_arrangement(
         if not orientations:
             continue
         for _ in range(max_attempts_per_vehicle):
+            check_cancellation(should_cancel)
             length, width = rng.choice(orientations)
             candidate = VehiclePlacement(
                 vehicle_id=vehicle.id,

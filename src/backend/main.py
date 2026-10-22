@@ -1,16 +1,17 @@
-from collections.abc import AsyncIterator
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from pydantic import BaseModel
 
 from api.config import router as config_router
+from api.optimization import router as optimization_router
 from api.runs import router as runs_router
 from core.database import create_client
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
     client = create_client()
     try:
         app.state.mongo_client = client
@@ -22,6 +23,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 app = FastAPI(title="DAI API", lifespan=lifespan)
 app.include_router(config_router)
 app.include_router(runs_router)
+app.include_router(optimization_router)
 
 
 class HealthResponse(BaseModel):

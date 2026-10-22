@@ -113,7 +113,7 @@ def test_random_move_can_load_a_vehicle_that_only_fits_rotated() -> None:
 def test_random_moves_can_travel_more_than_one_cell() -> None:
     config, state = setup_state()
     config.vehicles = config.vehicles[:1]
-    distant_moves = []
+    distant_moves: list[int] = []
     for seed in range(100):
         candidate = random_neighbor(config, state, Random(seed), max_attempts=1)
         if candidate and len(candidate) == 1:
@@ -145,7 +145,7 @@ def test_move_rotate_load_and_unload_produce_independent_valid_states() -> None:
     assert moved is not None and (moved[0].x, moved[0].y) == (1, 2)
     assert rotated is not None and (rotated[0].length, rotated[0].width) == (2, 3)
     assert loaded is not None and (loaded[1].length, loaded[1].width) == (1, 2)
-    assert unloaded == []
+    assert unloaded is not None and unloaded == []
     for candidate in [moved, rotated, loaded, unloaded]:
         assert validate_arrangement(config, candidate) == []
     loaded[0].x = 7

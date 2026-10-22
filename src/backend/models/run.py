@@ -10,6 +10,7 @@ from models.config import ConfigModel
 class HillClimbingSettings(BaseModel):
     algorithm: Literal["hill_climbing"]
     iterations: int = Field(gt=0)
+    variant: Literal["steepest_ascent"] = "steepest_ascent"
 
 
 class SimulatedAnnealingSettings(BaseModel):
@@ -47,6 +48,10 @@ class RunResult(BaseModel):
     final_objective: int = Field(ge=0)
     objective_history: list[ObjectivePoint]
     runtime_ms: float = Field(ge=0)
+    initial_arrangement: list[VehiclePlacement] | None = None
+    iterations_completed: int | None = Field(default=None, ge=0)
+    neighbors_evaluated: int | None = Field(default=None, ge=0)
+    stop_reason: Literal["local_optimum", "iteration_limit"] | None = None
 
 
 class RunModel(BaseModel):
