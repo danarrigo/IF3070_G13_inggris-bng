@@ -14,8 +14,9 @@ import './GeneticAlgorithm.css'
 import type { Config } from '../types/config'
 import type { GASettings, Job, PopulationPoint, Run } from '../types/run'
 import { arrangementConfig, vehicleColor } from './runView'
+import { objectiveLabel, objectiveUnit } from '../objective'
 
-function FitnessChart({ points }: { points: PopulationPoint[] }) {
+function FitnessChart({ points, unit }: { points: PopulationPoint[]; unit: string }) {
   if (!points.length)
     return <p className="field-hint">Fitness history appears after initialization.</p>
   const maximum = Math.max(1, ...points.map((p) => p.maximum))
@@ -27,7 +28,7 @@ function FitnessChart({ points }: { points: PopulationPoint[] }) {
       <svg
         viewBox="0 0 540 210"
         role="img"
-        aria-label="Maximum and average population fitness by generation"
+        aria-label={`Maximum and average population fitness by generation (${unit})`}
       >
         <path d="M44 16V172H520" fill="none" stroke="#aab6ad" />
         <text x="4" y="20">
@@ -481,7 +482,7 @@ export default function GeneticAlgorithmPanel({
           )}
         </div>
       )}
-      <FitnessChart points={points} />
+      <FitnessChart points={points} unit={objectiveUnit(source ?? config)} />
       {run && (
         <div className="replay-launch">
           {run.result.demo_trace?.steps.length ? (
@@ -542,7 +543,7 @@ export default function GeneticAlgorithmPanel({
                   {run.result.final_objective.toLocaleString()}
                 </strong>
                 <span>
-                  Shipping fee (+
+                  {objectiveLabel(run.config)} ({objectiveUnit(run.config)}; +
                   {(run.result.final_objective - run.result.initial_objective).toLocaleString()})
                 </span>
               </div>
@@ -638,7 +639,7 @@ export default function GeneticAlgorithmPanel({
                 void openRun(item)
               }}
             >
-              {new Date(item.created_at).toLocaleString()} · fee{' '}
+              {new Date(item.created_at).toLocaleString()} · {objectiveLabel(item.config)}{' '}
               {item.result.final_objective.toLocaleString()} · seed {item.random_seed}
               {item.result.demo_recorded ? ' · demo' : ''}
             </button>

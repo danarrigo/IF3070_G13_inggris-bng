@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import { executeHillClimbingLive, RunCancelledError } from '../api/liveOptimization'
 import type { Config } from '../types/config'
+import { objectiveUnit } from '../objective'
 import type {
   HillClimbingVariant,
   IterationComparison,
@@ -164,6 +165,7 @@ function SteepestAscentPanel({
       : ''
   const displayVariant = run?.settings.variant ?? live?.variant ?? variant
   const snapshot = run?.config ?? live?.config
+  const unit = objectiveUnit(snapshot ?? config)
   const changed = snapshot !== undefined && !sameConfig(snapshot, config)
   const initialObjective = run?.result.initial_objective ?? live?.initial_objective ?? 0
   const objective = run?.result.final_objective ?? live?.objective ?? 0
@@ -403,7 +405,7 @@ function SteepestAscentPanel({
               <div className="iteration-objective" aria-live="polite">
                 <span>
                   {comparison.before_objective.toLocaleString()} →{' '}
-                  {comparison.after_objective.toLocaleString()} million IDR
+                  {comparison.after_objective.toLocaleString()} {unit}
                 </span>
                 <strong>
                   {comparison.after_objective > comparison.before_objective
@@ -442,8 +444,7 @@ function SteepestAscentPanel({
           {preview && live && !run && (
             <div className="candidate-preview" role="status">
               <strong>
-                Neighbor #{live.neighbors_evaluated}: {preview.objective.toLocaleString()} million
-                IDR
+                Neighbor #{live.neighbors_evaluated}: {preview.objective.toLocaleString()} {unit}
               </strong>
               <span>
                 Iteration {live.evaluating_iteration} ·{' '}
@@ -451,8 +452,8 @@ function SteepestAscentPanel({
                 {previewVerdict}.
               </span>
               <span>
-                Best found: {(live.best_objective ?? live.objective).toLocaleString()} million IDR.
-                Amber wireframe is a preview in Current state view, not a committed state.
+                Best found: {(live.best_objective ?? live.objective).toLocaleString()} {unit}. Amber
+                wireframe is a preview in Current state view, not a committed state.
               </span>
             </div>
           )}
@@ -461,14 +462,14 @@ function SteepestAscentPanel({
               <dt>Initial objective</dt>
               <dd>
                 {initialObjective.toLocaleString()}
-                <small>million IDR</small>
+                <small>{unit}</small>
               </dd>
             </div>
             <div>
               <dt>{run ? 'Final objective' : 'Current objective'}</dt>
               <dd>
                 {objective.toLocaleString()}
-                <small>million IDR</small>
+                <small>{unit}</small>
               </dd>
             </div>
             <div>
@@ -507,7 +508,7 @@ function SteepestAscentPanel({
                 ` Scans per attempt (initial first): ${run.result.iterations_per_restart.join(', ')}.`}
             </p>
           )}
-          <ObjectiveChart history={history} />
+          <ObjectiveChart history={history} unit={unit} />
           <p className="field-hint">
             {run
               ? `Stopped: ${hillClimbingStopLabels[run.result.stop_reason]}`

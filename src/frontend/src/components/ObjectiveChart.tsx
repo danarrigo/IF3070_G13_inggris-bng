@@ -1,6 +1,12 @@
 import type { ObjectivePoint } from '../types/run'
 
-function ObjectiveChart({ history }: { history: ObjectivePoint[] }) {
+function ObjectiveChart({
+  history,
+  unit = 'million IDR',
+}: {
+  history: ObjectivePoint[]
+  unit?: string
+}) {
   const width = 440
   const height = 150
   const left = 48
@@ -20,12 +26,12 @@ function ObjectiveChart({ history }: { history: ObjectivePoint[] }) {
   return (
     <figure className="objective-chart">
       <figcaption>
-        Objective by iteration <span>Million IDR</span>
+        Objective by iteration <span>{unit}</span>
       </figcaption>
       <svg
         viewBox={`0 0 ${width} ${height}`}
         role="img"
-        aria-label={`Objective by iteration, from ${low} to ${high} million IDR`}
+        aria-label={`Objective by iteration, from ${low} to ${high} ${unit}`}
       >
         {[min, (min + max) / 2, max].map((tick) => (
           <g key={tick}>

@@ -4,6 +4,7 @@ import type { SteepestAscentRun, VehiclePlacement } from '../types/run.ts'
 
 export function sameConfig(first: Config, second: Config): boolean {
   return (
+    (first.objective_mode ?? 'shipping_fee') === (second.objective_mode ?? 'shipping_fee') &&
     first.preserve_positions === second.preserve_positions &&
     first.ship.length === second.ship.length &&
     first.ship.width === second.ship.width &&

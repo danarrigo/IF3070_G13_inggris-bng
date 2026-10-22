@@ -286,6 +286,7 @@ export interface SearchRun {
 export function arrangementConfig(config: Config, placements: Placement[]): Config {
   const loaded = new Map(placements.map((item) => [item.vehicle_id, item]))
   return {
+    ...config,
     ship: { ...config.ship },
     preserve_positions: true,
     vehicles: config.vehicles.map((vehicle) => {

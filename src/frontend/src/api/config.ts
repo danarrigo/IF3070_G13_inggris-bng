@@ -48,7 +48,10 @@ export function parseConfig(data: unknown): Config {
     !isShip(data.ship) ||
     !Array.isArray(data.vehicles) ||
     !data.vehicles.every(isVehicle) ||
-    (data.preserve_positions !== undefined && typeof data.preserve_positions !== 'boolean')
+    (data.preserve_positions !== undefined && typeof data.preserve_positions !== 'boolean') ||
+    (data.objective_mode !== undefined &&
+      data.objective_mode !== 'shipping_fee' &&
+      data.objective_mode !== 'eta_priority')
   ) {
     throw new Error('The API returned an unexpected config format.')
   }
@@ -56,6 +59,7 @@ export function parseConfig(data: unknown): Config {
     ship: data.ship,
     vehicles: data.vehicles,
     preserve_positions: data.preserve_positions === true,
+    ...(data.objective_mode !== undefined ? { objective_mode: data.objective_mode } : {}),
   }
 }
 

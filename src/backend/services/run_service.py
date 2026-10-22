@@ -17,6 +17,8 @@ from services.config_service import load_config
 
 def hash_config(config: ConfigModel) -> str:
     data = config.model_dump(mode="json")
+    if config.objective_mode == "shipping_fee":
+        data.pop("objective_mode", None)
     json_string = json.dumps(data, sort_keys=True, separators=(",", ":"))
     return hashlib.sha256(json_string.encode("utf-8")).hexdigest()
 

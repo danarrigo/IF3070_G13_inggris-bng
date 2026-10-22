@@ -3,6 +3,7 @@ import { streamAnnealing, loadAnnealingRuns, saveRun } from '../api/annealing'
 import type { Config } from '../types/config'
 import { arrangementConfig } from '../types/run'
 import { vehicleColor } from './runView'
+import { objectiveLabel, objectiveUnit } from '../objective'
 import type { AnnealingSettings, Placement, SearchRun } from '../types/run'
 
 function Chart({
@@ -250,7 +251,7 @@ export default function AnnealingPanel({
     <section className="panel sa-panel" aria-labelledby="sa-heading">
       <div className="section-heading">
         <h2 id="sa-heading">Simulated Annealing</h2>
-        <span className="unit-tag">Maximize shipping fee</span>
+        <span className="unit-tag">{objectiveLabel(config)}</span>
       </div>
       <form
         onSubmit={(event) => {
@@ -350,6 +351,7 @@ export default function AnnealingPanel({
               <thead>
                 <tr>
                   <th>Run / seed</th>
+                  <th>Objective</th>
                   <th>Initial</th>
                   <th>Best</th>
                   <th>Last</th>
@@ -373,6 +375,7 @@ export default function AnnealingPanel({
                         {index + 1} / {item.random_seed}
                       </button>
                     </td>
+                    <td>{objectiveLabel(item.config)}</td>
                     <td>{item.result.initial_objective}</td>
                     <td>{item.result.final_objective}</td>
                     <td>
@@ -496,7 +499,7 @@ export default function AnnealingPanel({
             . Their 3D models appear beside the ship.
           </p>
           <Chart
-            title="Objective vs iteration"
+            title={`Objective vs iteration (${objectiveUnit(run.config)})`}
             series={[
               {
                 label: 'Current',

@@ -11,6 +11,7 @@ import {
 import type { FormEvent } from 'react'
 import { loadConfig, saveConfig } from './api/config'
 import { compareIteration } from './iterationHistory'
+import { objectiveLabel } from './objective'
 import VehicleGenerator from './components/VehicleGenerator'
 import SteepestAscentPanel from './components/SteepestAscentPanel'
 import AnnealingPanel from './components/AnnealingPanel'
@@ -466,7 +467,8 @@ function App() {
             </div>
             <p className="scenario-summary">
               {config.ship.width} × {config.ship.length} deck · {config.vehicles.length} vehicles ·{' '}
-              {config.preserve_positions ? 'Custom start' : 'Random start'}
+              {config.preserve_positions ? 'Custom start' : 'Random start'} ·{' '}
+              {objectiveLabel(config)}
             </p>
             <div hidden={algorithm !== 'hill_climbing'}>
               <SteepestAscentPanel
@@ -573,6 +575,35 @@ function App() {
                 </p>
               </section>
 
+              <section className="panel" aria-labelledby="objective-heading">
+                <div className="section-heading">
+                  <h2 id="objective-heading">Objective</h2>
+                  <span className="unit-tag">Applies to HC, SA, and GA</span>
+                </div>
+                <label className="number-field saved-run-picker">
+                  <span>Objective mode</span>
+                  <select
+                    form="config-form"
+                    aria-label="Objective mode"
+                    value={config.objective_mode ?? 'shipping_fee'}
+                    onChange={(event) =>
+                      edit({
+                        ...config,
+                        objective_mode:
+                          event.target.value === 'eta_priority' ? 'eta_priority' : 'shipping_fee',
+                      })
+                    }
+                  >
+                    <option value="shipping_fee">Shipping fee (required)</option>
+                    <option value="eta_priority">ETA priority (bonus)</option>
+                  </select>
+                </label>
+                <p className="field-hint">
+                  {config.objective_mode === 'eta_priority'
+                    ? 'ETA only: each loaded vehicle earns max ETA + 1 - its ETA points. Smaller ETA is preferred; shipping fee is ignored.'
+                    : 'Maximize the shipping fees of loaded vehicles. Default for the required experiments.'}
+                </p>
+              </section>
               <section className="panel start-options" aria-label="Initial state">
                 <label className="start-mode">
                   <span>

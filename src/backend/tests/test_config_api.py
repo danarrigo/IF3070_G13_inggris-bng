@@ -56,7 +56,7 @@ def test_config_endpoints(
                 )
             assert response.status_code == expected_status
             if expected_status in {200, 201}:
-                assert response.json() == payload
+                assert response.json() == {**payload, "objective_mode": "shipping_fee"}
                 assert response.headers["content-type"] == "application/json"
             elif expected_status == 204:
                 assert response.content == b""

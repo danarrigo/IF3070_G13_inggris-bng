@@ -15,7 +15,10 @@ export interface Vehicle {
   shipping_fee: number
 }
 
+export type ObjectiveMode = 'shipping_fee' | 'eta_priority'
+
 export interface Config {
+  objective_mode?: ObjectiveMode
   ship: Ship
   vehicles: Vehicle[]
   preserve_positions: boolean

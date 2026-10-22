@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { Config } from '../types/config'
+import { placementObjective } from '../objective'
 import type { DemoIndividual, DemoStep, Placement, Run } from '../types/run'
 import { arrangementConfig, vehicleColor } from './runView'
 import { geneParent, pairParents, rouletteSegments, sourcePopulation } from './demoReplay'
@@ -469,13 +470,7 @@ export default function GeneticAlgorithmReplay({
           ].map((item) => (
             <div key={item.label}>
               <button type="button" onClick={() => setSelection(item)}>
-                {item.label} · fitness{' '}
-                {item.arrangement.reduce(
-                  (sum, p) =>
-                    sum +
-                    (run.config.vehicles.find((v) => v.id === p.vehicle_id)?.shipping_fee ?? 0),
-                  0
-                )}
+                {item.label} · fitness {placementObjective(run.config, item.arrangement)}
               </button>
               <ReplayGrid
                 config={run.config}

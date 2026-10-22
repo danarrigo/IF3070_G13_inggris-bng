@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { loadRuns } from '../api/runs'
+import { objectiveLabel, objectiveUnit } from '../objective'
 import type { SteepestAscentRun } from '../types/run'
 import { hillClimbingLabels, hillClimbingStopLabels } from '../types/run'
 import DownloadRunButton from './DownloadRunButton'
@@ -66,6 +67,7 @@ export default function ResultsPage({
     : []
   const comparison = comparable.find((item) => item.id === comparisonId)
   const result = run?.result
+  const unit = run ? objectiveUnit(run.config) : ''
 
   return (
     <section className="panel results-page" aria-labelledby="results-heading">
@@ -110,8 +112,8 @@ export default function ResultsPage({
             <span className="saved-label">Saved</span>
           </div>
           <p className="field-hint">
-            Seed {run.random_seed} · Limit {run.settings.iterations} scans ·{' '}
-            {new Date(run.created_at).toLocaleString()}
+            {objectiveLabel(run.config)} · Seed {run.random_seed} · Limit {run.settings.iterations}{' '}
+            scans · {new Date(run.created_at).toLocaleString()}
           </p>
           <p className="field-hint">3D ship view</p>
           <div className="scene-switch" role="group" aria-label="Result state view">
@@ -140,7 +142,7 @@ export default function ResultsPage({
                 >
                   <h3>{stage === 'initial' ? 'Initial arrangement' : 'Final arrangement'}</h3>
                   <p className="field-hint">
-                    {objective.toLocaleString()} million IDR · {placements.length} loaded ·{' '}
+                    {objective.toLocaleString()} {unit} · {placements.length} loaded ·{' '}
                     {run.config.vehicles.length - placements.length} unloaded
                   </p>
                   <ArrangementGrid
@@ -156,21 +158,21 @@ export default function ResultsPage({
               <dt>Initial objective</dt>
               <dd>
                 {result.initial_objective.toLocaleString()}
-                <small>million IDR</small>
+                <small>{unit}</small>
               </dd>
             </div>
             <div>
               <dt>Final objective</dt>
               <dd>
                 {result.final_objective.toLocaleString()}
-                <small>million IDR</small>
+                <small>{unit}</small>
               </dd>
             </div>
             <div>
               <dt>Improvement</dt>
               <dd>
                 +{(result.final_objective - result.initial_objective).toLocaleString()}
-                <small>million IDR</small>
+                <small>{unit}</small>
               </dd>
             </div>
             <div>
@@ -223,7 +225,7 @@ export default function ResultsPage({
               )}
             </div>
           )}
-          <ObjectiveChart history={result.objective_history} />
+          <ObjectiveChart history={result.objective_history} unit={unit} />
           <p className="field-hint">
             {hillClimbingStopLabels[result.stop_reason]} Iterations include the terminal
             no-improvement scan. Search time excludes initialization, database access, and

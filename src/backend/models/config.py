@@ -1,3 +1,4 @@
+from typing import Literal
 from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
@@ -24,3 +25,4 @@ class ConfigModel(BaseModel):
     ship: Ship
     vehicles: list[Vehicle]
     preserve_positions: bool = False
+    objective_mode: Literal["shipping_fee", "eta_priority"] = "shipping_fee"

@@ -52,6 +52,16 @@ Open the URL printed by Vite (usually http://localhost:5173). The scenario edito
 
 Vite proxies HTTP and WebSocket `/api` requests to `http://127.0.0.1:8000`, so no development CORS configuration is needed.
 
+## Bonus objective: ETA priority
+
+On the Config page, select **Objective mode → ETA priority (bonus)**. This mode uses **ETA only**, not shipping fees:
+
+```text
+score = sum(maximum ETA in the config + 1 - vehicle ETA) for loaded vehicles
+```
+
+Smaller ETA earns more points; all contributions are positive, so an empty ship does not win simply by loading nothing. This maximizes total loaded urgency, not the average/minimum ETA. HC (all variants), SA, GA, replay, saved snapshots, and charts use the selected mode. ETA scores are labeled **ETA priority points**, never monetary revenue. **Shipping fee (required)** remains the default for mandatory experiments. Different objective modes produce different config hashes and are not mixed in same-config comparisons; existing fee-mode hashes remain compatible.
+
 ## Running Steepest Ascent
 
 1. Configure or load a scenario and add vehicles on `/#config`.
