@@ -1,0 +1,2050 @@
+{
+  "id": "8e6c263c-4532-4a27-bc8b-261b6577b604",
+  "created_at": "2026-10-22T12:39:33.524384Z",
+  "random_seed": 44,
+  "configHash": "d8fe3866175b0cfc6b54b3788051278199cfec4b50dda05aa592913724f20840",
+  "config": {
+    "ship": {
+      "length": 20,
+      "width": 10,
+      "max_weight": 10000
+    },
+    "vehicles": [
+      {
+        "id": "68b1c2ff-3d4d-4e52-a320-33813941b2b7",
+        "x": null,
+        "y": null,
+        "length": 4,
+        "width": 3,
+        "weight": 1312,
+        "eta": 6,
+        "shipping_fee": 402
+      },
+      {
+        "id": "3ee60061-27ae-4627-a2b3-01840d8164a1",
+        "x": null,
+        "y": null,
+        "length": 5,
+        "width": 3,
+        "weight": 1676,
+        "eta": 20,
+        "shipping_fee": 875
+      },
+      {
+        "id": "36a9e388-2c9f-4d0d-a63f-dbab826fdcdc",
+        "x": null,
+        "y": null,
+        "length": 4,
+        "width": 3,
+        "weight": 1973,
+        "eta": 31,
+        "shipping_fee": 941
+      },
+      {
+        "id": "2d462ac2-af7d-4eae-aae2-9eae25432add",
+        "x": null,
+        "y": null,
+        "length": 2,
+        "width": 1,
+        "weight": 989,
+        "eta": 60,
+        "shipping_fee": 757
+      },
+      {
+        "id": "6a7453b8-8d4d-479b-a0ca-fe8b04b598f6",
+        "x": null,
+        "y": null,
+        "length": 5,
+        "width": 2,
+        "weight": 1434,
+        "eta": 33,
+        "shipping_fee": 664
+      },
+      {
+        "id": "4f3007fc-52cd-43a8-86a5-e46526178b77",
+        "x": null,
+        "y": null,
+        "length": 2,
+        "width": 2,
+        "weight": 1388,
+        "eta": 57,
+        "shipping_fee": 255
+      },
+      {
+        "id": "f3cd9c2d-2693-43f8-86c0-617edb4ec33e",
+        "x": null,
+        "y": null,
+        "length": 3,
+        "width": 2,
+        "weight": 1394,
+        "eta": 45,
+        "shipping_fee": 788
+      },
+      {
+        "id": "54b01471-78df-49e9-a5e3-4d132d2e4027",
+        "x": null,
+        "y": null,
+        "length": 3,
+        "width": 1,
+        "weight": 1333,
+        "eta": 52,
+        "shipping_fee": 842
+      },
+      {
+        "id": "ba2cfa8b-7240-467b-88d2-e2c56d1aaa89",
+        "x": null,
+        "y": null,
+        "length": 4,
+        "width": 2,
+        "weight": 1914,
+        "eta": 32,
+        "shipping_fee": 684
+      },
+      {
+        "id": "5759ff4d-256f-41df-979c-a885733ec307",
+        "x": null,
+        "y": null,
+        "length": 3,
+        "width": 1,
+        "weight": 1909,
+        "eta": 6,
+        "shipping_fee": 280
+      }
+    ],
+    "preserve_positions": false,
+    "objective_mode": "shipping_fee"
+  },
+  "settings": {
+    "algorithm": "genetic_algorithm",
+    "iterations": 200,
+    "population_size": 30,
+    "crossover_rate": 0.8,
+    "mutation_rate": 0.3
+  },
+  "result": {
+    "demo_recorded": false,
+    "demo_trace": null,
+    "population_history": [
+      {
+        "generation": 0,
+        "maximum": 4867,
+        "average": 3958.3
+      },
+      {
+        "generation": 1,
+        "maximum": 4867,
+        "average": 3661.3
+      },
+      {
+        "generation": 2,
+        "maximum": 4867,
+        "average": 3603.9333333333334
+      },
+      {
+        "generation": 3,
+        "maximum": 4867,
+        "average": 3666.733333333333
+      },
+      {
+        "generation": 4,
+        "maximum": 4867,
+        "average": 3477.0
+      },
+      {
+        "generation": 5,
+        "maximum": 4867,
+        "average": 3711.4
+      },
+      {
+        "generation": 6,
+        "maximum": 4867,
+        "average": 3698.9666666666667
+      },
+      {
+        "generation": 7,
+        "maximum": 4867,
+        "average": 4099.333333333333
+      },
+      {
+        "generation": 8,
+        "maximum": 4887,
+        "average": 4088.5
+      },
+      {
+        "generation": 9,
+        "maximum": 4887,
+        "average": 4081.633333333333
+      },
+      {
+        "generation": 10,
+        "maximum": 4887,
+        "average": 4075.6
+      },
+      {
+        "generation": 11,
+        "maximum": 4887,
+        "average": 4094.133333333333
+      },
+      {
+        "generation": 12,
+        "maximum": 4887,
+        "average": 3956.4666666666667
+      },
+      {
+        "generation": 13,
+        "maximum": 4887,
+        "average": 3871.133333333333
+      },
+      {
+        "generation": 14,
+        "maximum": 4887,
+        "average": 3906.8333333333335
+      },
+      {
+        "generation": 15,
+        "maximum": 4887,
+        "average": 3971.6
+      },
+      {
+        "generation": 16,
+        "maximum": 4887,
+        "average": 3883.3
+      },
+      {
+        "generation": 17,
+        "maximum": 4887,
+        "average": 3883.133333333333
+      },
+      {
+        "generation": 18,
+        "maximum": 4887,
+        "average": 3807.0333333333333
+      },
+      {
+        "generation": 19,
+        "maximum": 4887,
+        "average": 3937.0333333333333
+      },
+      {
+        "generation": 20,
+        "maximum": 4887,
+        "average": 3961.4
+      },
+      {
+        "generation": 21,
+        "maximum": 4887,
+        "average": 3938.766666666667
+      },
+      {
+        "generation": 22,
+        "maximum": 4887,
+        "average": 4099.833333333333
+      },
+      {
+        "generation": 23,
+        "maximum": 4887,
+        "average": 4205.166666666667
+      },
+      {
+        "generation": 24,
+        "maximum": 4887,
+        "average": 4121.9
+      },
+      {
+        "generation": 25,
+        "maximum": 4887,
+        "average": 3853.0
+      },
+      {
+        "generation": 26,
+        "maximum": 4887,
+        "average": 3994.1
+      },
+      {
+        "generation": 27,
+        "maximum": 4887,
+        "average": 4130.933333333333
+      },
+      {
+        "generation": 28,
+        "maximum": 4887,
+        "average": 4252.033333333334
+      },
+      {
+        "generation": 29,
+        "maximum": 4887,
+        "average": 4350.433333333333
+      },
+      {
+        "generation": 30,
+        "maximum": 4887,
+        "average": 4473.733333333334
+      },
+      {
+        "generation": 31,
+        "maximum": 4887,
+        "average": 4359.666666666667
+      },
+      {
+        "generation": 32,
+        "maximum": 4887,
+        "average": 4247.1
+      },
+      {
+        "generation": 33,
+        "maximum": 4887,
+        "average": 4482.333333333333
+      },
+      {
+        "generation": 34,
+        "maximum": 4887,
+        "average": 4552.766666666666
+      },
+      {
+        "generation": 35,
+        "maximum": 4887,
+        "average": 4590.566666666667
+      },
+      {
+        "generation": 36,
+        "maximum": 4887,
+        "average": 4674.8
+      },
+      {
+        "generation": 37,
+        "maximum": 4887,
+        "average": 4600.866666666667
+      },
+      {
+        "generation": 38,
+        "maximum": 4887,
+        "average": 4441.233333333334
+      },
+      {
+        "generation": 39,
+        "maximum": 4887,
+        "average": 4273.933333333333
+      },
+      {
+        "generation": 40,
+        "maximum": 4887,
+        "average": 4538.466666666666
+      },
+      {
+        "generation": 41,
+        "maximum": 4887,
+        "average": 4365.8
+      },
+      {
+        "generation": 42,
+        "maximum": 4887,
+        "average": 4361.7
+      },
+      {
+        "generation": 43,
+        "maximum": 4887,
+        "average": 4350.033333333334
+      },
+      {
+        "generation": 44,
+        "maximum": 4887,
+        "average": 4408.7
+      },
+      {
+        "generation": 45,
+        "maximum": 4887,
+        "average": 4328.666666666667
+      },
+      {
+        "generation": 46,
+        "maximum": 4887,
+        "average": 4506.433333333333
+      },
+      {
+        "generation": 47,
+        "maximum": 4887,
+        "average": 4443.866666666667
+      },
+      {
+        "generation": 48,
+        "maximum": 4887,
+        "average": 4318.0
+      },
+      {
+        "generation": 49,
+        "maximum": 4887,
+        "average": 4503.966666666666
+      },
+      {
+        "generation": 50,
+        "maximum": 4887,
+        "average": 4374.733333333334
+      },
+      {
+        "generation": 51,
+        "maximum": 4887,
+        "average": 4140.866666666667
+      },
+      {
+        "generation": 52,
+        "maximum": 4887,
+        "average": 4090.9
+      },
+      {
+        "generation": 53,
+        "maximum": 4887,
+        "average": 4149.466666666666
+      },
+      {
+        "generation": 54,
+        "maximum": 4887,
+        "average": 3960.1666666666665
+      },
+      {
+        "generation": 55,
+        "maximum": 4887,
+        "average": 3851.0333333333333
+      },
+      {
+        "generation": 56,
+        "maximum": 4887,
+        "average": 3899.1
+      },
+      {
+        "generation": 57,
+        "maximum": 4887,
+        "average": 3864.1666666666665
+      },
+      {
+        "generation": 58,
+        "maximum": 4887,
+        "average": 3874.5
+      },
+      {
+        "generation": 59,
+        "maximum": 4887,
+        "average": 3985.766666666667
+      },
+      {
+        "generation": 60,
+        "maximum": 4887,
+        "average": 4087.4333333333334
+      },
+      {
+        "generation": 61,
+        "maximum": 4887,
+        "average": 4330.0
+      },
+      {
+        "generation": 62,
+        "maximum": 4887,
+        "average": 4351.8
+      },
+      {
+        "generation": 63,
+        "maximum": 4887,
+        "average": 4505.7
+      },
+      {
+        "generation": 64,
+        "maximum": 4887,
+        "average": 4353.066666666667
+      },
+      {
+        "generation": 65,
+        "maximum": 4887,
+        "average": 4328.7
+      },
+      {
+        "generation": 66,
+        "maximum": 4887,
+        "average": 4371.366666666667
+      },
+      {
+        "generation": 67,
+        "maximum": 4887,
+        "average": 4521.066666666667
+      },
+      {
+        "generation": 68,
+        "maximum": 4887,
+        "average": 4583.933333333333
+      },
+      {
+        "generation": 69,
+        "maximum": 4887,
+        "average": 4381.5
+      },
+      {
+        "generation": 70,
+        "maximum": 4887,
+        "average": 4273.6
+      },
+      {
+        "generation": 71,
+        "maximum": 4887,
+        "average": 4414.9
+      },
+      {
+        "generation": 72,
+        "maximum": 4887,
+        "average": 4335.666666666667
+      },
+      {
+        "generation": 73,
+        "maximum": 4887,
+        "average": 4225.833333333333
+      },
+      {
+        "generation": 74,
+        "maximum": 4887,
+        "average": 4268.466666666666
+      },
+      {
+        "generation": 75,
+        "maximum": 4887,
+        "average": 3981.6666666666665
+      },
+      {
+        "generation": 76,
+        "maximum": 4887,
+        "average": 4037.133333333333
+      },
+      {
+        "generation": 77,
+        "maximum": 4887,
+        "average": 4085.766666666667
+      },
+      {
+        "generation": 78,
+        "maximum": 4887,
+        "average": 3943.8333333333335
+      },
+      {
+        "generation": 79,
+        "maximum": 4887,
+        "average": 3818.3
+      },
+      {
+        "generation": 80,
+        "maximum": 4887,
+        "average": 3909.0333333333333
+      },
+      {
+        "generation": 81,
+        "maximum": 4887,
+        "average": 4057.4
+      },
+      {
+        "generation": 82,
+        "maximum": 4887,
+        "average": 4013.4333333333334
+      },
+      {
+        "generation": 83,
+        "maximum": 4887,
+        "average": 4124.233333333334
+      },
+      {
+        "generation": 84,
+        "maximum": 4887,
+        "average": 4248.166666666667
+      },
+      {
+        "generation": 85,
+        "maximum": 4887,
+        "average": 4138.633333333333
+      },
+      {
+        "generation": 86,
+        "maximum": 4887,
+        "average": 4028.5333333333333
+      },
+      {
+        "generation": 87,
+        "maximum": 4887,
+        "average": 4147.9
+      },
+      {
+        "generation": 88,
+        "maximum": 4887,
+        "average": 4213.133333333333
+      },
+      {
+        "generation": 89,
+        "maximum": 4887,
+        "average": 4092.266666666667
+      },
+      {
+        "generation": 90,
+        "maximum": 4887,
+        "average": 4223.9
+      },
+      {
+        "generation": 91,
+        "maximum": 4887,
+        "average": 4206.0
+      },
+      {
+        "generation": 92,
+        "maximum": 4887,
+        "average": 4279.466666666666
+      },
+      {
+        "generation": 93,
+        "maximum": 4887,
+        "average": 4276.333333333333
+      },
+      {
+        "generation": 94,
+        "maximum": 4887,
+        "average": 4328.166666666667
+      },
+      {
+        "generation": 95,
+        "maximum": 4887,
+        "average": 4198.466666666666
+      },
+      {
+        "generation": 96,
+        "maximum": 4887,
+        "average": 4304.866666666667
+      },
+      {
+        "generation": 97,
+        "maximum": 4887,
+        "average": 4381.3
+      },
+      {
+        "generation": 98,
+        "maximum": 4887,
+        "average": 4585.433333333333
+      },
+      {
+        "generation": 99,
+        "maximum": 4887,
+        "average": 4497.366666666667
+      },
+      {
+        "generation": 100,
+        "maximum": 4887,
+        "average": 4370.333333333333
+      },
+      {
+        "generation": 101,
+        "maximum": 4887,
+        "average": 4307.466666666666
+      },
+      {
+        "generation": 102,
+        "maximum": 4887,
+        "average": 4289.066666666667
+      },
+      {
+        "generation": 103,
+        "maximum": 4887,
+        "average": 4355.1
+      },
+      {
+        "generation": 104,
+        "maximum": 4887,
+        "average": 4545.433333333333
+      },
+      {
+        "generation": 105,
+        "maximum": 4887,
+        "average": 4736.5
+      },
+      {
+        "generation": 106,
+        "maximum": 4887,
+        "average": 4776.4
+      },
+      {
+        "generation": 107,
+        "maximum": 4887,
+        "average": 4671.166666666667
+      },
+      {
+        "generation": 108,
+        "maximum": 4887,
+        "average": 4645.766666666666
+      },
+      {
+        "generation": 109,
+        "maximum": 4887,
+        "average": 4581.8
+      },
+      {
+        "generation": 110,
+        "maximum": 4887,
+        "average": 4296.5
+      },
+      {
+        "generation": 111,
+        "maximum": 4887,
+        "average": 4219.9
+      },
+      {
+        "generation": 112,
+        "maximum": 4887,
+        "average": 4414.3
+      },
+      {
+        "generation": 113,
+        "maximum": 4887,
+        "average": 4300.966666666666
+      },
+      {
+        "generation": 114,
+        "maximum": 4887,
+        "average": 4292.9
+      },
+      {
+        "generation": 115,
+        "maximum": 4887,
+        "average": 4258.3
+      },
+      {
+        "generation": 116,
+        "maximum": 4887,
+        "average": 4430.4
+      },
+      {
+        "generation": 117,
+        "maximum": 4887,
+        "average": 4336.133333333333
+      },
+      {
+        "generation": 118,
+        "maximum": 4887,
+        "average": 4441.633333333333
+      },
+      {
+        "generation": 119,
+        "maximum": 4887,
+        "average": 4420.233333333334
+      },
+      {
+        "generation": 120,
+        "maximum": 4887,
+        "average": 4334.7
+      },
+      {
+        "generation": 121,
+        "maximum": 4887,
+        "average": 4171.733333333334
+      },
+      {
+        "generation": 122,
+        "maximum": 4887,
+        "average": 4031.5
+      },
+      {
+        "generation": 123,
+        "maximum": 4887,
+        "average": 4132.2
+      },
+      {
+        "generation": 124,
+        "maximum": 4887,
+        "average": 4109.766666666666
+      },
+      {
+        "generation": 125,
+        "maximum": 4887,
+        "average": 4094.3333333333335
+      },
+      {
+        "generation": 126,
+        "maximum": 4887,
+        "average": 3911.4666666666667
+      },
+      {
+        "generation": 127,
+        "maximum": 4887,
+        "average": 4020.6666666666665
+      },
+      {
+        "generation": 128,
+        "maximum": 4887,
+        "average": 4270.866666666667
+      },
+      {
+        "generation": 129,
+        "maximum": 4887,
+        "average": 4268.7
+      },
+      {
+        "generation": 130,
+        "maximum": 4887,
+        "average": 4246.4
+      },
+      {
+        "generation": 131,
+        "maximum": 4887,
+        "average": 4366.1
+      },
+      {
+        "generation": 132,
+        "maximum": 4887,
+        "average": 4204.2
+      },
+      {
+        "generation": 133,
+        "maximum": 4887,
+        "average": 4042.733333333333
+      },
+      {
+        "generation": 134,
+        "maximum": 4887,
+        "average": 3910.366666666667
+      },
+      {
+        "generation": 135,
+        "maximum": 4887,
+        "average": 4073.5
+      },
+      {
+        "generation": 136,
+        "maximum": 4887,
+        "average": 4052.6666666666665
+      },
+      {
+        "generation": 137,
+        "maximum": 4887,
+        "average": 4072.5666666666666
+      },
+      {
+        "generation": 138,
+        "maximum": 4887,
+        "average": 4017.1
+      },
+      {
+        "generation": 139,
+        "maximum": 4887,
+        "average": 4164.433333333333
+      },
+      {
+        "generation": 140,
+        "maximum": 4887,
+        "average": 4237.933333333333
+      },
+      {
+        "generation": 141,
+        "maximum": 4887,
+        "average": 4322.566666666667
+      },
+      {
+        "generation": 142,
+        "maximum": 4887,
+        "average": 4278.733333333334
+      },
+      {
+        "generation": 143,
+        "maximum": 4887,
+        "average": 4339.733333333334
+      },
+      {
+        "generation": 144,
+        "maximum": 4887,
+        "average": 4417.966666666666
+      },
+      {
+        "generation": 145,
+        "maximum": 4887,
+        "average": 4285.233333333334
+      },
+      {
+        "generation": 146,
+        "maximum": 4887,
+        "average": 4268.033333333334
+      },
+      {
+        "generation": 147,
+        "maximum": 4887,
+        "average": 4395.233333333334
+      },
+      {
+        "generation": 148,
+        "maximum": 4887,
+        "average": 4405.6
+      },
+      {
+        "generation": 149,
+        "maximum": 4887,
+        "average": 4264.2
+      },
+      {
+        "generation": 150,
+        "maximum": 4887,
+        "average": 4240.5
+      },
+      {
+        "generation": 151,
+        "maximum": 4887,
+        "average": 4140.033333333334
+      },
+      {
+        "generation": 152,
+        "maximum": 4887,
+        "average": 4108.566666666667
+      },
+      {
+        "generation": 153,
+        "maximum": 4887,
+        "average": 4197.833333333333
+      },
+      {
+        "generation": 154,
+        "maximum": 4887,
+        "average": 4205.033333333334
+      },
+      {
+        "generation": 155,
+        "maximum": 4887,
+        "average": 4162.833333333333
+      },
+      {
+        "generation": 156,
+        "maximum": 4887,
+        "average": 4060.4333333333334
+      },
+      {
+        "generation": 157,
+        "maximum": 4887,
+        "average": 4018.866666666667
+      },
+      {
+        "generation": 158,
+        "maximum": 4887,
+        "average": 3923.266666666667
+      },
+      {
+        "generation": 159,
+        "maximum": 4887,
+        "average": 4027.0666666666666
+      },
+      {
+        "generation": 160,
+        "maximum": 4887,
+        "average": 4031.6
+      },
+      {
+        "generation": 161,
+        "maximum": 4887,
+        "average": 3958.0
+      },
+      {
+        "generation": 162,
+        "maximum": 4887,
+        "average": 4113.1
+      },
+      {
+        "generation": 163,
+        "maximum": 4887,
+        "average": 3977.6666666666665
+      },
+      {
+        "generation": 164,
+        "maximum": 4887,
+        "average": 3860.9333333333334
+      },
+      {
+        "generation": 165,
+        "maximum": 4887,
+        "average": 3933.6
+      },
+      {
+        "generation": 166,
+        "maximum": 4887,
+        "average": 4092.233333333333
+      },
+      {
+        "generation": 167,
+        "maximum": 4887,
+        "average": 3840.6
+      },
+      {
+        "generation": 168,
+        "maximum": 4887,
+        "average": 3785.4666666666667
+      },
+      {
+        "generation": 169,
+        "maximum": 4887,
+        "average": 3769.233333333333
+      },
+      {
+        "generation": 170,
+        "maximum": 4887,
+        "average": 3990.1666666666665
+      },
+      {
+        "generation": 171,
+        "maximum": 4887,
+        "average": 3965.9333333333334
+      },
+      {
+        "generation": 172,
+        "maximum": 4887,
+        "average": 3777.2
+      },
+      {
+        "generation": 173,
+        "maximum": 4887,
+        "average": 3849.9
+      },
+      {
+        "generation": 174,
+        "maximum": 4887,
+        "average": 3934.4
+      },
+      {
+        "generation": 175,
+        "maximum": 4887,
+        "average": 3752.233333333333
+      },
+      {
+        "generation": 176,
+        "maximum": 4887,
+        "average": 3627.8
+      },
+      {
+        "generation": 177,
+        "maximum": 4887,
+        "average": 3645.266666666667
+      },
+      {
+        "generation": 178,
+        "maximum": 4887,
+        "average": 4055.2
+      },
+      {
+        "generation": 179,
+        "maximum": 4887,
+        "average": 4008.0666666666666
+      },
+      {
+        "generation": 180,
+        "maximum": 4887,
+        "average": 3910.766666666667
+      },
+      {
+        "generation": 181,
+        "maximum": 4887,
+        "average": 3822.1666666666665
+      },
+      {
+        "generation": 182,
+        "maximum": 4887,
+        "average": 3699.233333333333
+      },
+      {
+        "generation": 183,
+        "maximum": 4887,
+        "average": 3765.5
+      },
+      {
+        "generation": 184,
+        "maximum": 4887,
+        "average": 3840.9
+      },
+      {
+        "generation": 185,
+        "maximum": 4887,
+        "average": 3620.5
+      },
+      {
+        "generation": 186,
+        "maximum": 4887,
+        "average": 3499.5666666666666
+      },
+      {
+        "generation": 187,
+        "maximum": 4887,
+        "average": 3428.0333333333333
+      },
+      {
+        "generation": 188,
+        "maximum": 4887,
+        "average": 3625.6
+      },
+      {
+        "generation": 189,
+        "maximum": 4887,
+        "average": 3598.766666666667
+      },
+      {
+        "generation": 190,
+        "maximum": 4887,
+        "average": 3557.0333333333333
+      },
+      {
+        "generation": 191,
+        "maximum": 4887,
+        "average": 3896.7
+      },
+      {
+        "generation": 192,
+        "maximum": 4887,
+        "average": 4040.9666666666667
+      },
+      {
+        "generation": 193,
+        "maximum": 4887,
+        "average": 4071.7
+      },
+      {
+        "generation": 194,
+        "maximum": 4887,
+        "average": 3964.5
+      },
+      {
+        "generation": 195,
+        "maximum": 4887,
+        "average": 3867.233333333333
+      },
+      {
+        "generation": 196,
+        "maximum": 4887,
+        "average": 3837.4666666666667
+      },
+      {
+        "generation": 197,
+        "maximum": 4887,
+        "average": 3833.2
+      },
+      {
+        "generation": 198,
+        "maximum": 4887,
+        "average": 3780.133333333333
+      },
+      {
+        "generation": 199,
+        "maximum": 4887,
+        "average": 3686.0333333333333
+      },
+      {
+        "generation": 200,
+        "maximum": 4887,
+        "average": 3794.866666666667
+      }
+    ],
+    "generations_completed": 200,
+    "final_arrangement": [
+      {
+        "vehicle_id": "3ee60061-27ae-4627-a2b3-01840d8164a1",
+        "x": 4,
+        "y": 3,
+        "length": 3,
+        "width": 5
+      },
+      {
+        "vehicle_id": "36a9e388-2c9f-4d0d-a63f-dbab826fdcdc",
+        "x": 5,
+        "y": 0,
+        "length": 3,
+        "width": 4
+      },
+      {
+        "vehicle_id": "2d462ac2-af7d-4eae-aae2-9eae25432add",
+        "x": 2,
+        "y": 12,
+        "length": 1,
+        "width": 2
+      },
+      {
+        "vehicle_id": "f3cd9c2d-2693-43f8-86c0-617edb4ec33e",
+        "x": 1,
+        "y": 6,
+        "length": 3,
+        "width": 2
+      },
+      {
+        "vehicle_id": "54b01471-78df-49e9-a5e3-4d132d2e4027",
+        "x": 4,
+        "y": 13,
+        "length": 1,
+        "width": 3
+      },
+      {
+        "vehicle_id": "ba2cfa8b-7240-467b-88d2-e2c56d1aaa89",
+        "x": 0,
+        "y": 13,
+        "length": 4,
+        "width": 2
+      }
+    ],
+    "unloaded_vehicle_ids": [
+      "68b1c2ff-3d4d-4e52-a320-33813941b2b7",
+      "6a7453b8-8d4d-479b-a0ca-fe8b04b598f6",
+      "4f3007fc-52cd-43a8-86a5-e46526178b77",
+      "5759ff4d-256f-41df-979c-a885733ec307"
+    ],
+    "initial_objective": 4867,
+    "final_objective": 4887,
+    "objective_history": [
+      {
+        "iteration": 0,
+        "objective": 4867
+      },
+      {
+        "iteration": 1,
+        "objective": 4867
+      },
+      {
+        "iteration": 2,
+        "objective": 4867
+      },
+      {
+        "iteration": 3,
+        "objective": 4867
+      },
+      {
+        "iteration": 4,
+        "objective": 4867
+      },
+      {
+        "iteration": 5,
+        "objective": 4867
+      },
+      {
+        "iteration": 6,
+        "objective": 4867
+      },
+      {
+        "iteration": 7,
+        "objective": 4867
+      },
+      {
+        "iteration": 8,
+        "objective": 4887
+      },
+      {
+        "iteration": 9,
+        "objective": 4887
+      },
+      {
+        "iteration": 10,
+        "objective": 4887
+      },
+      {
+        "iteration": 11,
+        "objective": 4887
+      },
+      {
+        "iteration": 12,
+        "objective": 4887
+      },
+      {
+        "iteration": 13,
+        "objective": 4887
+      },
+      {
+        "iteration": 14,
+        "objective": 4887
+      },
+      {
+        "iteration": 15,
+        "objective": 4887
+      },
+      {
+        "iteration": 16,
+        "objective": 4887
+      },
+      {
+        "iteration": 17,
+        "objective": 4887
+      },
+      {
+        "iteration": 18,
+        "objective": 4887
+      },
+      {
+        "iteration": 19,
+        "objective": 4887
+      },
+      {
+        "iteration": 20,
+        "objective": 4887
+      },
+      {
+        "iteration": 21,
+        "objective": 4887
+      },
+      {
+        "iteration": 22,
+        "objective": 4887
+      },
+      {
+        "iteration": 23,
+        "objective": 4887
+      },
+      {
+        "iteration": 24,
+        "objective": 4887
+      },
+      {
+        "iteration": 25,
+        "objective": 4887
+      },
+      {
+        "iteration": 26,
+        "objective": 4887
+      },
+      {
+        "iteration": 27,
+        "objective": 4887
+      },
+      {
+        "iteration": 28,
+        "objective": 4887
+      },
+      {
+        "iteration": 29,
+        "objective": 4887
+      },
+      {
+        "iteration": 30,
+        "objective": 4887
+      },
+      {
+        "iteration": 31,
+        "objective": 4887
+      },
+      {
+        "iteration": 32,
+        "objective": 4887
+      },
+      {
+        "iteration": 33,
+        "objective": 4887
+      },
+      {
+        "iteration": 34,
+        "objective": 4887
+      },
+      {
+        "iteration": 35,
+        "objective": 4887
+      },
+      {
+        "iteration": 36,
+        "objective": 4887
+      },
+      {
+        "iteration": 37,
+        "objective": 4887
+      },
+      {
+        "iteration": 38,
+        "objective": 4887
+      },
+      {
+        "iteration": 39,
+        "objective": 4887
+      },
+      {
+        "iteration": 40,
+        "objective": 4887
+      },
+      {
+        "iteration": 41,
+        "objective": 4887
+      },
+      {
+        "iteration": 42,
+        "objective": 4887
+      },
+      {
+        "iteration": 43,
+        "objective": 4887
+      },
+      {
+        "iteration": 44,
+        "objective": 4887
+      },
+      {
+        "iteration": 45,
+        "objective": 4887
+      },
+      {
+        "iteration": 46,
+        "objective": 4887
+      },
+      {
+        "iteration": 47,
+        "objective": 4887
+      },
+      {
+        "iteration": 48,
+        "objective": 4887
+      },
+      {
+        "iteration": 49,
+        "objective": 4887
+      },
+      {
+        "iteration": 50,
+        "objective": 4887
+      },
+      {
+        "iteration": 51,
+        "objective": 4887
+      },
+      {
+        "iteration": 52,
+        "objective": 4887
+      },
+      {
+        "iteration": 53,
+        "objective": 4887
+      },
+      {
+        "iteration": 54,
+        "objective": 4887
+      },
+      {
+        "iteration": 55,
+        "objective": 4887
+      },
+      {
+        "iteration": 56,
+        "objective": 4887
+      },
+      {
+        "iteration": 57,
+        "objective": 4887
+      },
+      {
+        "iteration": 58,
+        "objective": 4887
+      },
+      {
+        "iteration": 59,
+        "objective": 4887
+      },
+      {
+        "iteration": 60,
+        "objective": 4887
+      },
+      {
+        "iteration": 61,
+        "objective": 4887
+      },
+      {
+        "iteration": 62,
+        "objective": 4887
+      },
+      {
+        "iteration": 63,
+        "objective": 4887
+      },
+      {
+        "iteration": 64,
+        "objective": 4887
+      },
+      {
+        "iteration": 65,
+        "objective": 4887
+      },
+      {
+        "iteration": 66,
+        "objective": 4887
+      },
+      {
+        "iteration": 67,
+        "objective": 4887
+      },
+      {
+        "iteration": 68,
+        "objective": 4887
+      },
+      {
+        "iteration": 69,
+        "objective": 4887
+      },
+      {
+        "iteration": 70,
+        "objective": 4887
+      },
+      {
+        "iteration": 71,
+        "objective": 4887
+      },
+      {
+        "iteration": 72,
+        "objective": 4887
+      },
+      {
+        "iteration": 73,
+        "objective": 4887
+      },
+      {
+        "iteration": 74,
+        "objective": 4887
+      },
+      {
+        "iteration": 75,
+        "objective": 4887
+      },
+      {
+        "iteration": 76,
+        "objective": 4887
+      },
+      {
+        "iteration": 77,
+        "objective": 4887
+      },
+      {
+        "iteration": 78,
+        "objective": 4887
+      },
+      {
+        "iteration": 79,
+        "objective": 4887
+      },
+      {
+        "iteration": 80,
+        "objective": 4887
+      },
+      {
+        "iteration": 81,
+        "objective": 4887
+      },
+      {
+        "iteration": 82,
+        "objective": 4887
+      },
+      {
+        "iteration": 83,
+        "objective": 4887
+      },
+      {
+        "iteration": 84,
+        "objective": 4887
+      },
+      {
+        "iteration": 85,
+        "objective": 4887
+      },
+      {
+        "iteration": 86,
+        "objective": 4887
+      },
+      {
+        "iteration": 87,
+        "objective": 4887
+      },
+      {
+        "iteration": 88,
+        "objective": 4887
+      },
+      {
+        "iteration": 89,
+        "objective": 4887
+      },
+      {
+        "iteration": 90,
+        "objective": 4887
+      },
+      {
+        "iteration": 91,
+        "objective": 4887
+      },
+      {
+        "iteration": 92,
+        "objective": 4887
+      },
+      {
+        "iteration": 93,
+        "objective": 4887
+      },
+      {
+        "iteration": 94,
+        "objective": 4887
+      },
+      {
+        "iteration": 95,
+        "objective": 4887
+      },
+      {
+        "iteration": 96,
+        "objective": 4887
+      },
+      {
+        "iteration": 97,
+        "objective": 4887
+      },
+      {
+        "iteration": 98,
+        "objective": 4887
+      },
+      {
+        "iteration": 99,
+        "objective": 4887
+      },
+      {
+        "iteration": 100,
+        "objective": 4887
+      },
+      {
+        "iteration": 101,
+        "objective": 4887
+      },
+      {
+        "iteration": 102,
+        "objective": 4887
+      },
+      {
+        "iteration": 103,
+        "objective": 4887
+      },
+      {
+        "iteration": 104,
+        "objective": 4887
+      },
+      {
+        "iteration": 105,
+        "objective": 4887
+      },
+      {
+        "iteration": 106,
+        "objective": 4887
+      },
+      {
+        "iteration": 107,
+        "objective": 4887
+      },
+      {
+        "iteration": 108,
+        "objective": 4887
+      },
+      {
+        "iteration": 109,
+        "objective": 4887
+      },
+      {
+        "iteration": 110,
+        "objective": 4887
+      },
+      {
+        "iteration": 111,
+        "objective": 4887
+      },
+      {
+        "iteration": 112,
+        "objective": 4887
+      },
+      {
+        "iteration": 113,
+        "objective": 4887
+      },
+      {
+        "iteration": 114,
+        "objective": 4887
+      },
+      {
+        "iteration": 115,
+        "objective": 4887
+      },
+      {
+        "iteration": 116,
+        "objective": 4887
+      },
+      {
+        "iteration": 117,
+        "objective": 4887
+      },
+      {
+        "iteration": 118,
+        "objective": 4887
+      },
+      {
+        "iteration": 119,
+        "objective": 4887
+      },
+      {
+        "iteration": 120,
+        "objective": 4887
+      },
+      {
+        "iteration": 121,
+        "objective": 4887
+      },
+      {
+        "iteration": 122,
+        "objective": 4887
+      },
+      {
+        "iteration": 123,
+        "objective": 4887
+      },
+      {
+        "iteration": 124,
+        "objective": 4887
+      },
+      {
+        "iteration": 125,
+        "objective": 4887
+      },
+      {
+        "iteration": 126,
+        "objective": 4887
+      },
+      {
+        "iteration": 127,
+        "objective": 4887
+      },
+      {
+        "iteration": 128,
+        "objective": 4887
+      },
+      {
+        "iteration": 129,
+        "objective": 4887
+      },
+      {
+        "iteration": 130,
+        "objective": 4887
+      },
+      {
+        "iteration": 131,
+        "objective": 4887
+      },
+      {
+        "iteration": 132,
+        "objective": 4887
+      },
+      {
+        "iteration": 133,
+        "objective": 4887
+      },
+      {
+        "iteration": 134,
+        "objective": 4887
+      },
+      {
+        "iteration": 135,
+        "objective": 4887
+      },
+      {
+        "iteration": 136,
+        "objective": 4887
+      },
+      {
+        "iteration": 137,
+        "objective": 4887
+      },
+      {
+        "iteration": 138,
+        "objective": 4887
+      },
+      {
+        "iteration": 139,
+        "objective": 4887
+      },
+      {
+        "iteration": 140,
+        "objective": 4887
+      },
+      {
+        "iteration": 141,
+        "objective": 4887
+      },
+      {
+        "iteration": 142,
+        "objective": 4887
+      },
+      {
+        "iteration": 143,
+        "objective": 4887
+      },
+      {
+        "iteration": 144,
+        "objective": 4887
+      },
+      {
+        "iteration": 145,
+        "objective": 4887
+      },
+      {
+        "iteration": 146,
+        "objective": 4887
+      },
+      {
+        "iteration": 147,
+        "objective": 4887
+      },
+      {
+        "iteration": 148,
+        "objective": 4887
+      },
+      {
+        "iteration": 149,
+        "objective": 4887
+      },
+      {
+        "iteration": 150,
+        "objective": 4887
+      },
+      {
+        "iteration": 151,
+        "objective": 4887
+      },
+      {
+        "iteration": 152,
+        "objective": 4887
+      },
+      {
+        "iteration": 153,
+        "objective": 4887
+      },
+      {
+        "iteration": 154,
+        "objective": 4887
+      },
+      {
+        "iteration": 155,
+        "objective": 4887
+      },
+      {
+        "iteration": 156,
+        "objective": 4887
+      },
+      {
+        "iteration": 157,
+        "objective": 4887
+      },
+      {
+        "iteration": 158,
+        "objective": 4887
+      },
+      {
+        "iteration": 159,
+        "objective": 4887
+      },
+      {
+        "iteration": 160,
+        "objective": 4887
+      },
+      {
+        "iteration": 161,
+        "objective": 4887
+      },
+      {
+        "iteration": 162,
+        "objective": 4887
+      },
+      {
+        "iteration": 163,
+        "objective": 4887
+      },
+      {
+        "iteration": 164,
+        "objective": 4887
+      },
+      {
+        "iteration": 165,
+        "objective": 4887
+      },
+      {
+        "iteration": 166,
+        "objective": 4887
+      },
+      {
+        "iteration": 167,
+        "objective": 4887
+      },
+      {
+        "iteration": 168,
+        "objective": 4887
+      },
+      {
+        "iteration": 169,
+        "objective": 4887
+      },
+      {
+        "iteration": 170,
+        "objective": 4887
+      },
+      {
+        "iteration": 171,
+        "objective": 4887
+      },
+      {
+        "iteration": 172,
+        "objective": 4887
+      },
+      {
+        "iteration": 173,
+        "objective": 4887
+      },
+      {
+        "iteration": 174,
+        "objective": 4887
+      },
+      {
+        "iteration": 175,
+        "objective": 4887
+      },
+      {
+        "iteration": 176,
+        "objective": 4887
+      },
+      {
+        "iteration": 177,
+        "objective": 4887
+      },
+      {
+        "iteration": 178,
+        "objective": 4887
+      },
+      {
+        "iteration": 179,
+        "objective": 4887
+      },
+      {
+        "iteration": 180,
+        "objective": 4887
+      },
+      {
+        "iteration": 181,
+        "objective": 4887
+      },
+      {
+        "iteration": 182,
+        "objective": 4887
+      },
+      {
+        "iteration": 183,
+        "objective": 4887
+      },
+      {
+        "iteration": 184,
+        "objective": 4887
+      },
+      {
+        "iteration": 185,
+        "objective": 4887
+      },
+      {
+        "iteration": 186,
+        "objective": 4887
+      },
+      {
+        "iteration": 187,
+        "objective": 4887
+      },
+      {
+        "iteration": 188,
+        "objective": 4887
+      },
+      {
+        "iteration": 189,
+        "objective": 4887
+      },
+      {
+        "iteration": 190,
+        "objective": 4887
+      },
+      {
+        "iteration": 191,
+        "objective": 4887
+      },
+      {
+        "iteration": 192,
+        "objective": 4887
+      },
+      {
+        "iteration": 193,
+        "objective": 4887
+      },
+      {
+        "iteration": 194,
+        "objective": 4887
+      },
+      {
+        "iteration": 195,
+        "objective": 4887
+      },
+      {
+        "iteration": 196,
+        "objective": 4887
+      },
+      {
+        "iteration": 197,
+        "objective": 4887
+      },
+      {
+        "iteration": 198,
+        "objective": 4887
+      },
+      {
+        "iteration": 199,
+        "objective": 4887
+      },
+      {
+        "iteration": 200,
+        "objective": 4887
+      }
+    ],
+    "runtime_ms": 1686.5789350049454,
+    "initial_arrangement": [
+      {
+        "vehicle_id": "f3cd9c2d-2693-43f8-86c0-617edb4ec33e",
+        "x": 4,
+        "y": 17,
+        "length": 2,
+        "width": 3
+      },
+      {
+        "vehicle_id": "36a9e388-2c9f-4d0d-a63f-dbab826fdcdc",
+        "x": 2,
+        "y": 12,
+        "length": 4,
+        "width": 3
+      },
+      {
+        "vehicle_id": "54b01471-78df-49e9-a5e3-4d132d2e4027",
+        "x": 5,
+        "y": 14,
+        "length": 1,
+        "width": 3
+      },
+      {
+        "vehicle_id": "3ee60061-27ae-4627-a2b3-01840d8164a1",
+        "x": 1,
+        "y": 6,
+        "length": 3,
+        "width": 5
+      },
+      {
+        "vehicle_id": "2d462ac2-af7d-4eae-aae2-9eae25432add",
+        "x": 9,
+        "y": 17,
+        "length": 2,
+        "width": 1
+      },
+      {
+        "vehicle_id": "6a7453b8-8d4d-479b-a0ca-fe8b04b598f6",
+        "x": 7,
+        "y": 8,
+        "length": 5,
+        "width": 2
+      }
+    ],
+    "iterations_completed": null,
+    "neighbors_evaluated": null,
+    "stop_reason": null,
+    "sideways_moves": null,
+    "restarts_completed": null,
+    "iterations_per_restart": null,
+    "last_arrangement": [],
+    "best_objective": 0,
+    "stuck_count": 0,
+    "annealing_history": [],
+    "snapshots": []
+  }
+}

@@ -1,0 +1,1150 @@
+{
+  "id": "823ba883-24ab-45dc-bf74-910b320d089c",
+  "created_at": "2026-10-22T12:39:37.943662Z",
+  "random_seed": 42,
+  "configHash": "d8fe3866175b0cfc6b54b3788051278199cfec4b50dda05aa592913724f20840",
+  "config": {
+    "ship": {
+      "length": 20,
+      "width": 10,
+      "max_weight": 10000
+    },
+    "vehicles": [
+      {
+        "id": "68b1c2ff-3d4d-4e52-a320-33813941b2b7",
+        "x": null,
+        "y": null,
+        "length": 4,
+        "width": 3,
+        "weight": 1312,
+        "eta": 6,
+        "shipping_fee": 402
+      },
+      {
+        "id": "3ee60061-27ae-4627-a2b3-01840d8164a1",
+        "x": null,
+        "y": null,
+        "length": 5,
+        "width": 3,
+        "weight": 1676,
+        "eta": 20,
+        "shipping_fee": 875
+      },
+      {
+        "id": "36a9e388-2c9f-4d0d-a63f-dbab826fdcdc",
+        "x": null,
+        "y": null,
+        "length": 4,
+        "width": 3,
+        "weight": 1973,
+        "eta": 31,
+        "shipping_fee": 941
+      },
+      {
+        "id": "2d462ac2-af7d-4eae-aae2-9eae25432add",
+        "x": null,
+        "y": null,
+        "length": 2,
+        "width": 1,
+        "weight": 989,
+        "eta": 60,
+        "shipping_fee": 757
+      },
+      {
+        "id": "6a7453b8-8d4d-479b-a0ca-fe8b04b598f6",
+        "x": null,
+        "y": null,
+        "length": 5,
+        "width": 2,
+        "weight": 1434,
+        "eta": 33,
+        "shipping_fee": 664
+      },
+      {
+        "id": "4f3007fc-52cd-43a8-86a5-e46526178b77",
+        "x": null,
+        "y": null,
+        "length": 2,
+        "width": 2,
+        "weight": 1388,
+        "eta": 57,
+        "shipping_fee": 255
+      },
+      {
+        "id": "f3cd9c2d-2693-43f8-86c0-617edb4ec33e",
+        "x": null,
+        "y": null,
+        "length": 3,
+        "width": 2,
+        "weight": 1394,
+        "eta": 45,
+        "shipping_fee": 788
+      },
+      {
+        "id": "54b01471-78df-49e9-a5e3-4d132d2e4027",
+        "x": null,
+        "y": null,
+        "length": 3,
+        "width": 1,
+        "weight": 1333,
+        "eta": 52,
+        "shipping_fee": 842
+      },
+      {
+        "id": "ba2cfa8b-7240-467b-88d2-e2c56d1aaa89",
+        "x": null,
+        "y": null,
+        "length": 4,
+        "width": 2,
+        "weight": 1914,
+        "eta": 32,
+        "shipping_fee": 684
+      },
+      {
+        "id": "5759ff4d-256f-41df-979c-a885733ec307",
+        "x": null,
+        "y": null,
+        "length": 3,
+        "width": 1,
+        "weight": 1909,
+        "eta": 6,
+        "shipping_fee": 280
+      }
+    ],
+    "preserve_positions": false,
+    "objective_mode": "shipping_fee"
+  },
+  "settings": {
+    "algorithm": "genetic_algorithm",
+    "iterations": 100,
+    "population_size": 40,
+    "crossover_rate": 0.8,
+    "mutation_rate": 0.3
+  },
+  "result": {
+    "demo_recorded": false,
+    "demo_trace": null,
+    "population_history": [
+      {
+        "generation": 0,
+        "maximum": 4501,
+        "average": 3886.825
+      },
+      {
+        "generation": 1,
+        "maximum": 4501,
+        "average": 3731.9
+      },
+      {
+        "generation": 2,
+        "maximum": 4501,
+        "average": 3593.125
+      },
+      {
+        "generation": 3,
+        "maximum": 4501,
+        "average": 3644.3
+      },
+      {
+        "generation": 4,
+        "maximum": 4501,
+        "average": 3511.2
+      },
+      {
+        "generation": 5,
+        "maximum": 4501,
+        "average": 3624.575
+      },
+      {
+        "generation": 6,
+        "maximum": 4649,
+        "average": 3490.275
+      },
+      {
+        "generation": 7,
+        "maximum": 4649,
+        "average": 3398.325
+      },
+      {
+        "generation": 8,
+        "maximum": 4649,
+        "average": 3366.8
+      },
+      {
+        "generation": 9,
+        "maximum": 4649,
+        "average": 3392.75
+      },
+      {
+        "generation": 10,
+        "maximum": 4676,
+        "average": 3193.2
+      },
+      {
+        "generation": 11,
+        "maximum": 4676,
+        "average": 3043.875
+      },
+      {
+        "generation": 12,
+        "maximum": 4676,
+        "average": 3269.025
+      },
+      {
+        "generation": 13,
+        "maximum": 4676,
+        "average": 3407.9
+      },
+      {
+        "generation": 14,
+        "maximum": 4676,
+        "average": 3413.925
+      },
+      {
+        "generation": 15,
+        "maximum": 4676,
+        "average": 3540.5
+      },
+      {
+        "generation": 16,
+        "maximum": 4676,
+        "average": 3645.65
+      },
+      {
+        "generation": 17,
+        "maximum": 4676,
+        "average": 3896.675
+      },
+      {
+        "generation": 18,
+        "maximum": 4676,
+        "average": 3820.375
+      },
+      {
+        "generation": 19,
+        "maximum": 4676,
+        "average": 3923.25
+      },
+      {
+        "generation": 20,
+        "maximum": 4676,
+        "average": 3781.4
+      },
+      {
+        "generation": 21,
+        "maximum": 4676,
+        "average": 3869.9
+      },
+      {
+        "generation": 22,
+        "maximum": 4676,
+        "average": 3890.95
+      },
+      {
+        "generation": 23,
+        "maximum": 4676,
+        "average": 3788.025
+      },
+      {
+        "generation": 24,
+        "maximum": 4676,
+        "average": 3877.6
+      },
+      {
+        "generation": 25,
+        "maximum": 4676,
+        "average": 3772.675
+      },
+      {
+        "generation": 26,
+        "maximum": 4676,
+        "average": 3745.35
+      },
+      {
+        "generation": 27,
+        "maximum": 4676,
+        "average": 3451.475
+      },
+      {
+        "generation": 28,
+        "maximum": 4676,
+        "average": 3429.925
+      },
+      {
+        "generation": 29,
+        "maximum": 4676,
+        "average": 3513.075
+      },
+      {
+        "generation": 30,
+        "maximum": 4676,
+        "average": 3393.65
+      },
+      {
+        "generation": 31,
+        "maximum": 4676,
+        "average": 3699.525
+      },
+      {
+        "generation": 32,
+        "maximum": 4676,
+        "average": 3803.8
+      },
+      {
+        "generation": 33,
+        "maximum": 4676,
+        "average": 3661.975
+      },
+      {
+        "generation": 34,
+        "maximum": 4763,
+        "average": 3786.275
+      },
+      {
+        "generation": 35,
+        "maximum": 4763,
+        "average": 3826.2
+      },
+      {
+        "generation": 36,
+        "maximum": 4763,
+        "average": 3777.725
+      },
+      {
+        "generation": 37,
+        "maximum": 4763,
+        "average": 3892.7
+      },
+      {
+        "generation": 38,
+        "maximum": 4763,
+        "average": 3858.9
+      },
+      {
+        "generation": 39,
+        "maximum": 4794,
+        "average": 3873.5
+      },
+      {
+        "generation": 40,
+        "maximum": 4794,
+        "average": 3778.025
+      },
+      {
+        "generation": 41,
+        "maximum": 4794,
+        "average": 3799.0
+      },
+      {
+        "generation": 42,
+        "maximum": 4794,
+        "average": 3968.275
+      },
+      {
+        "generation": 43,
+        "maximum": 4794,
+        "average": 3871.675
+      },
+      {
+        "generation": 44,
+        "maximum": 4794,
+        "average": 3897.025
+      },
+      {
+        "generation": 45,
+        "maximum": 4794,
+        "average": 3896.95
+      },
+      {
+        "generation": 46,
+        "maximum": 4794,
+        "average": 3923.875
+      },
+      {
+        "generation": 47,
+        "maximum": 4794,
+        "average": 4025.475
+      },
+      {
+        "generation": 48,
+        "maximum": 4794,
+        "average": 4100.1
+      },
+      {
+        "generation": 49,
+        "maximum": 4794,
+        "average": 4083.75
+      },
+      {
+        "generation": 50,
+        "maximum": 4887,
+        "average": 4052.2
+      },
+      {
+        "generation": 51,
+        "maximum": 4887,
+        "average": 3983.475
+      },
+      {
+        "generation": 52,
+        "maximum": 4887,
+        "average": 4094.425
+      },
+      {
+        "generation": 53,
+        "maximum": 4887,
+        "average": 3882.75
+      },
+      {
+        "generation": 54,
+        "maximum": 4887,
+        "average": 3869.15
+      },
+      {
+        "generation": 55,
+        "maximum": 4887,
+        "average": 3819.3
+      },
+      {
+        "generation": 56,
+        "maximum": 4887,
+        "average": 3727.925
+      },
+      {
+        "generation": 57,
+        "maximum": 4887,
+        "average": 3768.925
+      },
+      {
+        "generation": 58,
+        "maximum": 4887,
+        "average": 3791.05
+      },
+      {
+        "generation": 59,
+        "maximum": 4887,
+        "average": 3888.125
+      },
+      {
+        "generation": 60,
+        "maximum": 4887,
+        "average": 3919.85
+      },
+      {
+        "generation": 61,
+        "maximum": 4887,
+        "average": 4075.1
+      },
+      {
+        "generation": 62,
+        "maximum": 4887,
+        "average": 4030.7
+      },
+      {
+        "generation": 63,
+        "maximum": 4887,
+        "average": 4028.475
+      },
+      {
+        "generation": 64,
+        "maximum": 4887,
+        "average": 3970.025
+      },
+      {
+        "generation": 65,
+        "maximum": 4887,
+        "average": 3894.475
+      },
+      {
+        "generation": 66,
+        "maximum": 4887,
+        "average": 4027.5
+      },
+      {
+        "generation": 67,
+        "maximum": 4887,
+        "average": 3943.7
+      },
+      {
+        "generation": 68,
+        "maximum": 4887,
+        "average": 4014.3
+      },
+      {
+        "generation": 69,
+        "maximum": 4887,
+        "average": 3962.25
+      },
+      {
+        "generation": 70,
+        "maximum": 4887,
+        "average": 3882.9
+      },
+      {
+        "generation": 71,
+        "maximum": 4887,
+        "average": 3935.15
+      },
+      {
+        "generation": 72,
+        "maximum": 4887,
+        "average": 3907.175
+      },
+      {
+        "generation": 73,
+        "maximum": 4887,
+        "average": 3869.675
+      },
+      {
+        "generation": 74,
+        "maximum": 4887,
+        "average": 3943.325
+      },
+      {
+        "generation": 75,
+        "maximum": 4887,
+        "average": 4020.5
+      },
+      {
+        "generation": 76,
+        "maximum": 4887,
+        "average": 4121.175
+      },
+      {
+        "generation": 77,
+        "maximum": 4887,
+        "average": 4160.725
+      },
+      {
+        "generation": 78,
+        "maximum": 4887,
+        "average": 4234.55
+      },
+      {
+        "generation": 79,
+        "maximum": 4887,
+        "average": 4161.625
+      },
+      {
+        "generation": 80,
+        "maximum": 4887,
+        "average": 4102.325
+      },
+      {
+        "generation": 81,
+        "maximum": 4887,
+        "average": 4462.7
+      },
+      {
+        "generation": 82,
+        "maximum": 4887,
+        "average": 4502.9
+      },
+      {
+        "generation": 83,
+        "maximum": 4887,
+        "average": 4365.225
+      },
+      {
+        "generation": 84,
+        "maximum": 4887,
+        "average": 4404.45
+      },
+      {
+        "generation": 85,
+        "maximum": 4887,
+        "average": 4292.925
+      },
+      {
+        "generation": 86,
+        "maximum": 4887,
+        "average": 4173.7
+      },
+      {
+        "generation": 87,
+        "maximum": 4887,
+        "average": 4005.125
+      },
+      {
+        "generation": 88,
+        "maximum": 4887,
+        "average": 4070.7
+      },
+      {
+        "generation": 89,
+        "maximum": 4887,
+        "average": 4109.15
+      },
+      {
+        "generation": 90,
+        "maximum": 4887,
+        "average": 4129.675
+      },
+      {
+        "generation": 91,
+        "maximum": 4887,
+        "average": 3984.15
+      },
+      {
+        "generation": 92,
+        "maximum": 4887,
+        "average": 3903.225
+      },
+      {
+        "generation": 93,
+        "maximum": 4887,
+        "average": 4007.3
+      },
+      {
+        "generation": 94,
+        "maximum": 4887,
+        "average": 3924.475
+      },
+      {
+        "generation": 95,
+        "maximum": 4887,
+        "average": 4020.875
+      },
+      {
+        "generation": 96,
+        "maximum": 4887,
+        "average": 4144.125
+      },
+      {
+        "generation": 97,
+        "maximum": 4887,
+        "average": 4162.925
+      },
+      {
+        "generation": 98,
+        "maximum": 4887,
+        "average": 4252.925
+      },
+      {
+        "generation": 99,
+        "maximum": 4887,
+        "average": 4198.575
+      },
+      {
+        "generation": 100,
+        "maximum": 4887,
+        "average": 4342.5
+      }
+    ],
+    "generations_completed": 100,
+    "final_arrangement": [
+      {
+        "vehicle_id": "3ee60061-27ae-4627-a2b3-01840d8164a1",
+        "x": 3,
+        "y": 15,
+        "length": 3,
+        "width": 5
+      },
+      {
+        "vehicle_id": "36a9e388-2c9f-4d0d-a63f-dbab826fdcdc",
+        "x": 6,
+        "y": 11,
+        "length": 3,
+        "width": 4
+      },
+      {
+        "vehicle_id": "2d462ac2-af7d-4eae-aae2-9eae25432add",
+        "x": 1,
+        "y": 9,
+        "length": 1,
+        "width": 2
+      },
+      {
+        "vehicle_id": "f3cd9c2d-2693-43f8-86c0-617edb4ec33e",
+        "x": 0,
+        "y": 11,
+        "length": 3,
+        "width": 2
+      },
+      {
+        "vehicle_id": "54b01471-78df-49e9-a5e3-4d132d2e4027",
+        "x": 0,
+        "y": 8,
+        "length": 1,
+        "width": 3
+      },
+      {
+        "vehicle_id": "ba2cfa8b-7240-467b-88d2-e2c56d1aaa89",
+        "x": 3,
+        "y": 7,
+        "length": 2,
+        "width": 4
+      }
+    ],
+    "unloaded_vehicle_ids": [
+      "68b1c2ff-3d4d-4e52-a320-33813941b2b7",
+      "6a7453b8-8d4d-479b-a0ca-fe8b04b598f6",
+      "4f3007fc-52cd-43a8-86a5-e46526178b77",
+      "5759ff4d-256f-41df-979c-a885733ec307"
+    ],
+    "initial_objective": 4501,
+    "final_objective": 4887,
+    "objective_history": [
+      {
+        "iteration": 0,
+        "objective": 4501
+      },
+      {
+        "iteration": 1,
+        "objective": 4501
+      },
+      {
+        "iteration": 2,
+        "objective": 4501
+      },
+      {
+        "iteration": 3,
+        "objective": 4501
+      },
+      {
+        "iteration": 4,
+        "objective": 4501
+      },
+      {
+        "iteration": 5,
+        "objective": 4501
+      },
+      {
+        "iteration": 6,
+        "objective": 4649
+      },
+      {
+        "iteration": 7,
+        "objective": 4649
+      },
+      {
+        "iteration": 8,
+        "objective": 4649
+      },
+      {
+        "iteration": 9,
+        "objective": 4649
+      },
+      {
+        "iteration": 10,
+        "objective": 4676
+      },
+      {
+        "iteration": 11,
+        "objective": 4676
+      },
+      {
+        "iteration": 12,
+        "objective": 4676
+      },
+      {
+        "iteration": 13,
+        "objective": 4676
+      },
+      {
+        "iteration": 14,
+        "objective": 4676
+      },
+      {
+        "iteration": 15,
+        "objective": 4676
+      },
+      {
+        "iteration": 16,
+        "objective": 4676
+      },
+      {
+        "iteration": 17,
+        "objective": 4676
+      },
+      {
+        "iteration": 18,
+        "objective": 4676
+      },
+      {
+        "iteration": 19,
+        "objective": 4676
+      },
+      {
+        "iteration": 20,
+        "objective": 4676
+      },
+      {
+        "iteration": 21,
+        "objective": 4676
+      },
+      {
+        "iteration": 22,
+        "objective": 4676
+      },
+      {
+        "iteration": 23,
+        "objective": 4676
+      },
+      {
+        "iteration": 24,
+        "objective": 4676
+      },
+      {
+        "iteration": 25,
+        "objective": 4676
+      },
+      {
+        "iteration": 26,
+        "objective": 4676
+      },
+      {
+        "iteration": 27,
+        "objective": 4676
+      },
+      {
+        "iteration": 28,
+        "objective": 4676
+      },
+      {
+        "iteration": 29,
+        "objective": 4676
+      },
+      {
+        "iteration": 30,
+        "objective": 4676
+      },
+      {
+        "iteration": 31,
+        "objective": 4676
+      },
+      {
+        "iteration": 32,
+        "objective": 4676
+      },
+      {
+        "iteration": 33,
+        "objective": 4676
+      },
+      {
+        "iteration": 34,
+        "objective": 4763
+      },
+      {
+        "iteration": 35,
+        "objective": 4763
+      },
+      {
+        "iteration": 36,
+        "objective": 4763
+      },
+      {
+        "iteration": 37,
+        "objective": 4763
+      },
+      {
+        "iteration": 38,
+        "objective": 4763
+      },
+      {
+        "iteration": 39,
+        "objective": 4794
+      },
+      {
+        "iteration": 40,
+        "objective": 4794
+      },
+      {
+        "iteration": 41,
+        "objective": 4794
+      },
+      {
+        "iteration": 42,
+        "objective": 4794
+      },
+      {
+        "iteration": 43,
+        "objective": 4794
+      },
+      {
+        "iteration": 44,
+        "objective": 4794
+      },
+      {
+        "iteration": 45,
+        "objective": 4794
+      },
+      {
+        "iteration": 46,
+        "objective": 4794
+      },
+      {
+        "iteration": 47,
+        "objective": 4794
+      },
+      {
+        "iteration": 48,
+        "objective": 4794
+      },
+      {
+        "iteration": 49,
+        "objective": 4794
+      },
+      {
+        "iteration": 50,
+        "objective": 4887
+      },
+      {
+        "iteration": 51,
+        "objective": 4887
+      },
+      {
+        "iteration": 52,
+        "objective": 4887
+      },
+      {
+        "iteration": 53,
+        "objective": 4887
+      },
+      {
+        "iteration": 54,
+        "objective": 4887
+      },
+      {
+        "iteration": 55,
+        "objective": 4887
+      },
+      {
+        "iteration": 56,
+        "objective": 4887
+      },
+      {
+        "iteration": 57,
+        "objective": 4887
+      },
+      {
+        "iteration": 58,
+        "objective": 4887
+      },
+      {
+        "iteration": 59,
+        "objective": 4887
+      },
+      {
+        "iteration": 60,
+        "objective": 4887
+      },
+      {
+        "iteration": 61,
+        "objective": 4887
+      },
+      {
+        "iteration": 62,
+        "objective": 4887
+      },
+      {
+        "iteration": 63,
+        "objective": 4887
+      },
+      {
+        "iteration": 64,
+        "objective": 4887
+      },
+      {
+        "iteration": 65,
+        "objective": 4887
+      },
+      {
+        "iteration": 66,
+        "objective": 4887
+      },
+      {
+        "iteration": 67,
+        "objective": 4887
+      },
+      {
+        "iteration": 68,
+        "objective": 4887
+      },
+      {
+        "iteration": 69,
+        "objective": 4887
+      },
+      {
+        "iteration": 70,
+        "objective": 4887
+      },
+      {
+        "iteration": 71,
+        "objective": 4887
+      },
+      {
+        "iteration": 72,
+        "objective": 4887
+      },
+      {
+        "iteration": 73,
+        "objective": 4887
+      },
+      {
+        "iteration": 74,
+        "objective": 4887
+      },
+      {
+        "iteration": 75,
+        "objective": 4887
+      },
+      {
+        "iteration": 76,
+        "objective": 4887
+      },
+      {
+        "iteration": 77,
+        "objective": 4887
+      },
+      {
+        "iteration": 78,
+        "objective": 4887
+      },
+      {
+        "iteration": 79,
+        "objective": 4887
+      },
+      {
+        "iteration": 80,
+        "objective": 4887
+      },
+      {
+        "iteration": 81,
+        "objective": 4887
+      },
+      {
+        "iteration": 82,
+        "objective": 4887
+      },
+      {
+        "iteration": 83,
+        "objective": 4887
+      },
+      {
+        "iteration": 84,
+        "objective": 4887
+      },
+      {
+        "iteration": 85,
+        "objective": 4887
+      },
+      {
+        "iteration": 86,
+        "objective": 4887
+      },
+      {
+        "iteration": 87,
+        "objective": 4887
+      },
+      {
+        "iteration": 88,
+        "objective": 4887
+      },
+      {
+        "iteration": 89,
+        "objective": 4887
+      },
+      {
+        "iteration": 90,
+        "objective": 4887
+      },
+      {
+        "iteration": 91,
+        "objective": 4887
+      },
+      {
+        "iteration": 92,
+        "objective": 4887
+      },
+      {
+        "iteration": 93,
+        "objective": 4887
+      },
+      {
+        "iteration": 94,
+        "objective": 4887
+      },
+      {
+        "iteration": 95,
+        "objective": 4887
+      },
+      {
+        "iteration": 96,
+        "objective": 4887
+      },
+      {
+        "iteration": 97,
+        "objective": 4887
+      },
+      {
+        "iteration": 98,
+        "objective": 4887
+      },
+      {
+        "iteration": 99,
+        "objective": 4887
+      },
+      {
+        "iteration": 100,
+        "objective": 4887
+      }
+    ],
+    "runtime_ms": 1231.3447019987507,
+    "initial_arrangement": [
+      {
+        "vehicle_id": "36a9e388-2c9f-4d0d-a63f-dbab826fdcdc",
+        "x": 6,
+        "y": 11,
+        "length": 3,
+        "width": 4
+      },
+      {
+        "vehicle_id": "54b01471-78df-49e9-a5e3-4d132d2e4027",
+        "x": 1,
+        "y": 1,
+        "length": 3,
+        "width": 1
+      },
+      {
+        "vehicle_id": "3ee60061-27ae-4627-a2b3-01840d8164a1",
+        "x": 4,
+        "y": 2,
+        "length": 5,
+        "width": 3
+      },
+      {
+        "vehicle_id": "ba2cfa8b-7240-467b-88d2-e2c56d1aaa89",
+        "x": 1,
+        "y": 12,
+        "length": 4,
+        "width": 2
+      },
+      {
+        "vehicle_id": "2d462ac2-af7d-4eae-aae2-9eae25432add",
+        "x": 5,
+        "y": 11,
+        "length": 2,
+        "width": 1
+      },
+      {
+        "vehicle_id": "68b1c2ff-3d4d-4e52-a320-33813941b2b7",
+        "x": 3,
+        "y": 8,
+        "length": 3,
+        "width": 4
+      }
+    ],
+    "iterations_completed": null,
+    "neighbors_evaluated": null,
+    "stop_reason": null,
+    "sideways_moves": null,
+    "restarts_completed": null,
+    "iterations_per_restart": null,
+    "last_arrangement": [],
+    "best_objective": 0,
+    "stuck_count": 0,
+    "annealing_history": [],
+    "snapshots": []
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "config": {
+    "ship": {
+      "length": 20,
+      "width": 10,
+      "max_weight": 10000
+    },
+    "vehicles": [
+      {
+        "id": "68b1c2ff-3d4d-4e52-a320-33813941b2b7",
+        "x": null,
+        "y": null,
+        "length": 4,
+        "width": 3,
+        "weight": 1312,
+        "eta": 6,
+        "shipping_fee": 402
+      },
+      {
+        "id": "3ee60061-27ae-4627-a2b3-01840d8164a1",
+        "x": null,
+        "y": null,
+        "length": 5,
+        "width": 3,
+        "weight": 1676,
+        "eta": 20,
+        "shipping_fee": 875
+      },
+      {
+        "id": "36a9e388-2c9f-4d0d-a63f-dbab826fdcdc",
+        "x": null,
+        "y": null,
+        "length": 4,
+        "width": 3,
+        "weight": 1973,
+        "eta": 31,
+        "shipping_fee": 941
+      },
+      {
+        "id": "2d462ac2-af7d-4eae-aae2-9eae25432add",
+        "x": null,
+        "y": null,
+        "length": 2,
+        "width": 1,
+        "weight": 989,
+        "eta": 60,
+        "shipping_fee": 757
+      },
+      {
+        "id": "6a7453b8-8d4d-479b-a0ca-fe8b04b598f6",
+        "x": null,
+        "y": null,
+        "length": 5,
+        "width": 2,
+        "weight": 1434,
+        "eta": 33,
+        "shipping_fee": 664
+      },
+      {
+        "id": "4f3007fc-52cd-43a8-86a5-e46526178b77",
+        "x": null,
+        "y": null,
+        "length": 2,
+        "width": 2,
+        "weight": 1388,
+        "eta": 57,
+        "shipping_fee": 255
+      },
+      {
+        "id": "f3cd9c2d-2693-43f8-86c0-617edb4ec33e",
+        "x": null,
+        "y": null,
+        "length": 3,
+        "width": 2,
+        "weight": 1394,
+        "eta": 45,
+        "shipping_fee": 788
+      },
+      {
+        "id": "54b01471-78df-49e9-a5e3-4d132d2e4027",
+        "x": null,
+        "y": null,
+        "length": 3,
+        "width": 1,
+        "weight": 1333,
+        "eta": 52,
+        "shipping_fee": 842
+      },
+      {
+        "id": "ba2cfa8b-7240-467b-88d2-e2c56d1aaa89",
+        "x": null,
+        "y": null,
+        "length": 4,
+        "width": 2,
+        "weight": 1914,
+        "eta": 32,
+        "shipping_fee": 684
+      },
+      {
+        "id": "5759ff4d-256f-41df-979c-a885733ec307",
+        "x": null,
+        "y": null,
+        "length": 3,
+        "width": 1,
+        "weight": 1909,
+        "eta": 6,
+        "shipping_fee": 280
+      }
+    ],
+    "preserve_positions": false,
+    "objective_mode": "shipping_fee"
+  },
+  "random_seed": 44,
+  "iterations": 100,
+  "show_neighbors": false,
+  "save_to_output": true,
+  "acknowledge_progress": false,
+  "variant": "sideways",
+  "max_sideways": 10,
+  "max_restart": 3
+}

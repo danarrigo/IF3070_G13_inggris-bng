@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="577" viewBox="0 0 800 577" role="img" aria-label="Final arrangement">
+<rect width="100%" height="100%" fill="white"/>
+<g font-family="sans-serif" font-size="12" fill="#263c35">
+<text x="24" y="28" font-size="17">Final arrangement</text>
+<text x="24" y="52">Score: 4887 million IDR | Loaded: 6/10 | Seed: 44</text>
+<text x="24" y="74">Deck: 10 x 20; origin (0, 0) top-left | Weight: 9279/10000</text>
+<rect x="40" y="90" width="180.00" height="360.00" fill="#f0f4eb" stroke="#789477"/>
+<rect x="112.00" y="144.00" width="90.00" height="54.00" fill="hsl(178,45%,35%)" stroke="white"><title>V2: (4, 3), 5 x 3, ETA 20, weight 1676</title></rect>
+<text x="157.00" y="175.00" text-anchor="middle" fill="white">V2</text>
+<rect x="130.00" y="90.00" width="72.00" height="54.00" fill="hsl(302,45%,35%)" stroke="white"><title>V3: (5, 0), 4 x 3, ETA 31, weight 1973</title></rect>
+<text x="166.00" y="121.00" text-anchor="middle" fill="white">V3</text>
+<rect x="76.00" y="306.00" width="36.00" height="18.00" fill="hsl(81,45%,35%)" stroke="white"><title>V4: (2, 12), 2 x 1, ETA 60, weight 989</title></rect>
+<text x="94.00" y="319.00" text-anchor="middle" fill="white">V4</text>
+<rect x="58.00" y="198.00" width="36.00" height="54.00" fill="hsl(260,45%,35%)" stroke="white"><title>V7: (1, 6), 2 x 3, ETA 45, weight 1394</title></rect>
+<text x="76.00" y="229.00" text-anchor="middle" fill="white">V7</text>
+<rect x="112.00" y="324.00" width="54.00" height="18.00" fill="hsl(22,45%,35%)" stroke="white"><title>V8: (4, 13), 3 x 1, ETA 52, weight 1333</title></rect>
+<text x="139.00" y="337.00" text-anchor="middle" fill="white">V8</text>
+<rect x="40.00" y="324.00" width="36.00" height="72.00" fill="hsl(203,45%,35%)" stroke="white"><title>V9: (0, 13), 2 x 4, ETA 32, weight 1914</title></rect>
+<text x="58.00" y="364.00" text-anchor="middle" fill="white">V9</text>
+<text x="24" y="470.00">Outside ship: 4 vehicles (listed below, not to scale)</text>
+<text x="24" y="495.00">V1: 3x4, ETA 6</text>
+<text x="214" y="495.00">V5: 2x5, ETA 33</text>
+<text x="404" y="495.00">V6: 2x2, ETA 57</text>
+<text x="594" y="495.00">V10: 1x3, ETA 6</text>
+</g></svg>

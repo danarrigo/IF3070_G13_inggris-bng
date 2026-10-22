@@ -1,0 +1,48 @@
+{
+  "random_seed": 42,
+  "objective": 4267,
+  "arrangement": [
+    {
+      "vehicle_id": "54b01471-78df-49e9-a5e3-4d132d2e4027",
+      "x": 0,
+      "y": 0,
+      "length": 1,
+      "width": 3
+    },
+    {
+      "vehicle_id": "2d462ac2-af7d-4eae-aae2-9eae25432add",
+      "x": 3,
+      "y": 7,
+      "length": 2,
+      "width": 1
+    },
+    {
+      "vehicle_id": "36a9e388-2c9f-4d0d-a63f-dbab826fdcdc",
+      "x": 3,
+      "y": 13,
+      "length": 4,
+      "width": 3
+    },
+    {
+      "vehicle_id": "ba2cfa8b-7240-467b-88d2-e2c56d1aaa89",
+      "x": 7,
+      "y": 8,
+      "length": 4,
+      "width": 2
+    },
+    {
+      "vehicle_id": "4f3007fc-52cd-43a8-86a5-e46526178b77",
+      "x": 4,
+      "y": 4,
+      "length": 2,
+      "width": 2
+    },
+    {
+      "vehicle_id": "f3cd9c2d-2693-43f8-86c0-617edb4ec33e",
+      "x": 6,
+      "y": 3,
+      "length": 3,
+      "width": 2
+    }
+  ]
+}

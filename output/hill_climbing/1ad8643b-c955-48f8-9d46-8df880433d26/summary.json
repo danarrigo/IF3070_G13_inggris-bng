@@ -1,0 +1,31 @@
+{
+  "run_id": "1ad8643b-c955-48f8-9d46-8df880433d26",
+  "created_at": "2026-10-22T12:39:14.815677+00:00",
+  "config_hash": "d8fe3866175b0cfc6b54b3788051278199cfec4b50dda05aa592913724f20840",
+  "random_seed": 42,
+  "objective_mode": "shipping_fee",
+  "objective_unit": "million IDR",
+  "settings": {
+    "algorithm": "hill_climbing",
+    "iterations": 100,
+    "variant": "sideways",
+    "max_sideways": 10,
+    "max_restart": 3
+  },
+  "metrics": {
+    "initial_objective": 4267,
+    "final_objective": 4887,
+    "runtime_ms": 1727.2263650011155,
+    "iterations_completed": 14,
+    "neighbors_evaluated": 7731,
+    "stop_reason": "sideways_limit",
+    "sideways_moves": 10,
+    "restarts_completed": 0,
+    "iterations_per_restart": [
+      14
+    ],
+    "initial_loaded": 6,
+    "final_loaded": 6,
+    "final_unloaded": 4
+  }
+}
