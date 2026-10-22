@@ -28,8 +28,10 @@ def create_run(db: DatabaseDep, run_request: CreateRunRequest):
 
 
 @router.get("/api/runs", response_model=list[RunModel])
-def get_runs(db: DatabaseDep, config_hash: str | None = None):
-    return find_runs(db, config_hash)
+def get_runs(db: DatabaseDep, config_hash: str | None = None, include_trace: bool = True):
+    if include_trace:
+        return find_runs(db, config_hash)
+    return find_runs(db, config_hash, include_trace=False)
 
 
 @router.get("/api/runs/{id}", response_model=RunModel)
