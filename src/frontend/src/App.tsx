@@ -2,6 +2,8 @@ import { lazy, Suspense, useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
 import { loadConfig, saveConfig } from './api/config'
 import VehicleGenerator from './components/VehicleGenerator'
+import GeneticAlgorithmPanel from './components/GeneticAlgorithmPanel'
+import { vehicleColor } from './components/runView'
 import type { Config, Vehicle } from './types/config'
 import './App.css'
 
@@ -37,6 +39,7 @@ function App() {
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
   const [dirty, setDirty] = useState(false)
+  const [resultPreview, setResultPreview] = useState<Config | null>(null)
 
   function edit(next: Config) {
     setConfig(next)
@@ -116,7 +119,7 @@ function App() {
   return (
     <main>
       <Suspense fallback={<div className="ship-background" aria-hidden="true" />}>
-        <ShipBackground config={previewConfig} />
+        <ShipBackground config={resultPreview ?? previewConfig} />
       </Suspense>
       <div className="config-shell">
       <form id="config-form" onSubmit={(event) => { void save(event) }} />
@@ -173,7 +176,7 @@ function App() {
                     <details className="vehicle-card" key={vehicle.id} open={index === 0}
                       onInvalidCapture={(event) => { event.currentTarget.open = true }}>
                       <summary>
-                        <span className="vehicle-name"><span className="vehicle-dot" style={{ background: `hsl(${index * 67 + 165} 45% 35%)` }} />Vehicle {String(index + 1).padStart(2, '0')}</span>
+                        <span className="vehicle-name"><span className="vehicle-dot" style={{ background: vehicleColor(vehicle.id) }} />Vehicle {String(index + 1).padStart(2, '0')}</span>
                         <span className="vehicle-summary">{vehicle.width} × {vehicle.length}<span className="summary-divider">/</span>{vehicle.weight.toLocaleString()} weight</span>
                         <span className="expand-icon" aria-hidden="true">+</span>
                       </summary>
@@ -197,7 +200,7 @@ function App() {
             </div>
 
             <details className="panel preview">
-              <summary><span>Initial arrangement</span><span className="preview-summary">{placed.length} placed <span aria-hidden="true">+</span></span></summary>
+              <summary><span>Draft arrangement</span><span className="preview-summary">{placed.length} placed <span aria-hidden="true">+</span></span></summary>
               <div className="preview-body">
               <div className="stats"><div><strong>{placed.length}/{config.vehicles.length}</strong><span>Placed vehicles</span></div>
                 <div><strong>{totalWeight.toLocaleString()}</strong><span>/ {config.ship.max_weight.toLocaleString()} weight</span></div></div>
@@ -209,7 +212,7 @@ function App() {
                   {previewConfig.vehicles.map((vehicle, index) => vehicle.x !== null && vehicle.y !== null && (
                     <div key={vehicle.id} className="grid-vehicle" title={`Vehicle ${index + 1}: (${vehicle.x}, ${vehicle.y}), ${vehicle.width} × ${vehicle.length}`}
                       style={{ left: `${vehicle.x / config.ship.width * 100}%`, top: `${vehicle.y / config.ship.length * 100}%`,
-                        width: `${vehicle.width / config.ship.width * 100}%`, height: `${vehicle.length / config.ship.length * 100}%`, background: `hsl(${index * 67 + 165} 45% 35%)` }}>V{index + 1}</div>
+                        width: `${vehicle.width / config.ship.width * 100}%`, height: `${vehicle.length / config.ship.length * 100}%`, background: vehicleColor(vehicle.id) }}>V{index + 1}</div>
                   ))}
                   {placed.length === 0 && <span className="grid-placeholder">No placed vehicles</span>}
                 </div>
@@ -220,6 +223,7 @@ function App() {
             </details>
           </div>
         </fieldset>
+        <GeneticAlgorithmPanel config={config} onPreview={setResultPreview} />
       </div>
     </main>
   )

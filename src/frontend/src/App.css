@@ -100,6 +100,76 @@ button.remove { border: 0; padding: 5px 0 5px 6px; color: #a47d67; font-size: .6
 .error { color: #975947; background: #fcf2ed; border: 1px solid #edd7cc; margin: 0 0 16px; }
 .warnings { color: #8e7847; background: #fbf7e9; margin-top: 16px; }
 .warnings ul { margin: 6px 0 0; padding-left: 16px; }
+.ga-panel { border-top: 1px solid #dce2d9; margin-top: 24px; padding-top: 24px; }
+.run-button { margin: 16px 0; }
+.job-progress { padding: 14px; background: #edf3ed; border-radius: 6px; margin: 12px 0; font-size: .7rem; }
+.job-progress .section-heading { flex-wrap: wrap; margin-bottom: 10px; }
+.job-progress strong { text-transform: capitalize; }
+.job-progress progress { width: 100%; accent-color: #285b42; }
+.job-progress p { margin-bottom: 0; }
+.fitness-chart { margin: 18px 0; }
+.fitness-chart svg { width: 100%; display: block; overflow: visible; }
+.fitness-chart text { font-size: 10px; fill: #647266; }
+.fitness-chart figcaption { display: flex; gap: 20px; font-size: .65rem; }
+.maximum-key { color: #285b42; }
+.average-key { color: #946421; }
+.result-controls { display: flex; flex-wrap: wrap; gap: 6px; }
+.result-controls button[aria-pressed="true"] { background: #e2ecdf; border-color: #799278; }
+.result-stats { margin-top: 16px; }
+.result-stats strong { font-size: .95rem; }
+.result-grid { width: min(100%, 320px); max-height: 440px; margin-top: 16px; }
+.history-heading { margin: 24px 0 12px; }
+.run-history { display: grid; gap: 6px; max-height: 240px; overflow: auto; }
+.run-history button { text-align: left; }
+.ga-panel .error button { margin: 8px; }
+button:disabled { opacity: .55; cursor: not-allowed; }
+.demo-option { display: flex; align-items: center; gap: 8px; font-size: .75rem; margin-top: 18px; }
+.demo-option input { width: auto; accent-color: #285b42; }
+.demo-help { padding: 8px 12px; background: #f1f5ed; border-radius: 6px; margin-top: 8px; }
+.demo-help button { margin-top: 8px; }
+.replay-launch { margin: 16px 0; }
+.ga-replay { border: 1px solid #d4decf; border-radius: 8px; padding: 16px; margin: 16px 0; background: #fcfdf9; }
+.replay-navigation { display: flex; flex-wrap: wrap; gap: 8px; align-items: end; }
+.replay-navigation label { display: flex; flex-direction: column; gap: 4px; font-size: .65rem; color: #65735e; }
+.replay-navigation select { border: 1px solid #cdd7c9; padding: 7px; background: white; border-radius: 4px; }
+.replay-narration { padding: 12px; border-left: 3px solid #4c7759; background: #edf3e8; font-size: .78rem; }
+.population-group { margin-top: 16px; min-width: 0; }
+.population-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; margin-top: 10px; }
+.population-cards button { display: flex; flex-direction: column; gap: 5px; text-align: left; }
+.population-cards button[aria-pressed="true"] { border: 2px solid #416b4a; background: #e8f1e1; }
+.population-cards small { font-size: .6rem; color: #6b7a61; }
+.generation-comparison { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.generation-comparison .population-cards { grid-template-columns: 1fr; }
+.roulette-bar { position: relative; display: flex; height: 36px; margin: 20px 0; }
+.roulette-bar span { display: flex; align-items: center; justify-content: center; min-width: 0; color: white; font-size: .65rem; overflow: hidden; }
+.roulette-marker { position: absolute; top: -8px; bottom: -8px; width: 2px; background: #202a22; transform: translateX(-1px); }
+.roulette-marker::before { content: '▼'; position: absolute; left: -6px; top: -10px; font-size: 12px; }
+.roulette-table { border-collapse: collapse; width: 100%; font-size: .65rem; }
+.roulette-table th, .roulette-table td { text-align: left; padding: 7px 4px; border-bottom: 1px solid #e0e7db; }
+.roulette-table .selected-row { background: #dfecd7; font-weight: 600; }
+.draw-detail { font-size: .75rem; }
+.genes-scroll { overflow-x: auto; margin-top: 12px; padding-bottom: 8px; }
+.gene-row { display: flex; width: max-content; gap: 4px; margin: 6px 0; }
+.gene-label { width: 55px; align-self: center; font-size: .65rem; }
+.gene-cell { display: flex; flex-direction: column; gap: 4px; width: 83px; padding: 8px; border: 1px solid #d3ddcd; border-radius: 4px; font-size: .65rem; }
+.gene-cell strong { display: flex; align-items: center; gap: 5px; }
+.gene-cell i { width: 7px; height: 7px; border-radius: 50%; }
+.gene-cell small { font-size: .58rem; }
+.gene-cell.cut-start { border-left: 3px dashed #273b30; margin-left: 8px; }
+.origin-1 { background: #e5edf9; border-bottom: 2px solid #6386bc; }
+.origin-2 { background: #fff0dc; border-bottom: 2px solid #c19351; }
+.origin-label { padding: 3px 5px; display: inline-block; }
+.mutation-comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px 0; }
+.mutation-comparison > p { grid-column: 1 / -1; }
+.replay-grid { margin: 12px auto; }
+.changed-vehicle { outline: 3px solid #ffce37; outline-offset: -3px; z-index: 2; }
+.replay-preview { border-top: 1px solid #dce4d5; padding-top: 14px; margin-top: 16px; }
+.stop-button { margin-top: 10px; border-color: #ae7a62; color: #824c33; }
+.saved-run { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.saved-run .open-run { flex: 1; min-width: 0; }
+.delete-confirmation { flex-basis: 100%; padding: 10px; border: 1px solid #e4c8b9; background: #fff5ef; border-radius: 5px; font-size: .7rem; }
+.delete-confirmation p { margin-top: 0; }
+.delete-confirmation button { margin-right: 8px; }
 @media (max-width: 760px) {
   main { padding: 28px 16px; }
   .config-shell { margin: 210px auto 0; width: min(560px, 100%); background: #fffffff0; padding: 22px; }
