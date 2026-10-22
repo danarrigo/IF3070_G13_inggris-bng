@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import type { Config, Vehicle } from '../types/config.ts'
+import { vehicleColor } from './runView.ts'
 
 export interface VehicleLayout {
   vehicle: Vehicle
@@ -218,7 +219,7 @@ export function buildScenario(
   }
 
   const wheelTransforms: THREE.Matrix4[] = []
-  const palette = new Map<number, THREE.Material>()
+  const palette = new Map<string, THREE.Material>()
   const layouts = layoutVehicles(config)
   for (const layout of layouts) {
     if (options.vehicleIds && !options.vehicleIds.has(layout.vehicle.id)) continue
@@ -231,11 +232,11 @@ export function buildScenario(
       .multiply(new THREE.Matrix4().makeRotationY(angle))
     const radius = Math.min(l * 0.1, w * 0.18)
     const height = Math.min(l * 0.25, w * 0.65)
-    const hue = (layout.index * 67 + 165) % 360
-    let paint = palette.get(hue)
+    const color = vehicleColor(layout.vehicle.id)
+    let paint = palette.get(color)
     if (!paint) {
-      paint = material(`paint-${hue}`, new THREE.Color(`hsl(${hue}, 45%, 35%)`), 0.4)
-      palette.set(hue, paint)
+      paint = material(`paint-${color}`, new THREE.Color(color), 0.4)
+      palette.set(color, paint)
     }
     box(l * 0.96, height * 0.43, w * 0.84, 0, radius + height * 0.16, 0, paint, origin)
     box(l * 0.48, height * 0.42, w * 0.7, -l * 0.04, radius + height * 0.56, 0, paint, origin)

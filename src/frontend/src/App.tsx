@@ -14,6 +14,8 @@ import { compareIteration } from './iterationHistory'
 import VehicleGenerator from './components/VehicleGenerator'
 import SteepestAscentPanel from './components/SteepestAscentPanel'
 import AnnealingPanel from './components/AnnealingPanel'
+import GeneticAlgorithmPanel from './components/GeneticAlgorithmPanel'
+import { vehicleColor } from './components/runView'
 import ResultsPage from './components/ResultsPage'
 import ArrangementGrid from './components/ArrangementGrid'
 import { configForPlacements, configForRunView } from './components/runPresentation'
@@ -84,10 +86,15 @@ function App() {
   const [busy, setBusy] = useState(false)
   const [dirty, setDirty] = useState(false)
   const [running, setRunning] = useState(false)
-  const [algorithm, setAlgorithm] = useState<'hill_climbing' | 'simulated_annealing'>(
-    'hill_climbing'
-  )
+  const [algorithm, setAlgorithm] = useState<
+    'hill_climbing' | 'simulated_annealing' | 'genetic_algorithm'
+  >('hill_climbing')
   const [annealingPreview, setAnnealingPreview] = useState<Config | null>(null)
+  const [geneticPreview, setGeneticPreview] = useState<Config | null>(null)
+  const handleGARunning = useCallback((active: boolean) => {
+    setRunning(active)
+    if (active) setAlgorithm('genetic_algorithm')
+  }, [])
   const [completedRun, setCompletedRun] = useState<SteepestAscentRun | null>(null)
   const [resultRun, setResultRun] = useState<SteepestAscentRun | null>(null)
   const [resultView, setResultView] = useState<'initial' | 'final'>('final')
@@ -274,6 +281,8 @@ function App() {
   const previewConfig = useMemo(() => {
     if (page === 'results')
       return resultRun ? configForRunView(resultRun, resultView) : draftPreview
+    if (page === 'optimization' && algorithm === 'genetic_algorithm')
+      return geneticPreview ?? draftPreview
     if (page === 'optimization' && algorithm === 'simulated_annealing')
       return annealingPreview ?? draftPreview
     if (page !== 'optimization' || view === 'configuration') return draftPreview
@@ -293,6 +302,7 @@ function App() {
     resultView,
     algorithm,
     annealingPreview,
+    geneticPreview,
   ])
   const displayShip = previewConfig.ship
   const placed = previewConfig.vehicles.filter(
@@ -434,12 +444,15 @@ function App() {
                   setAlgorithm(
                     event.target.value === 'simulated_annealing'
                       ? 'simulated_annealing'
-                      : 'hill_climbing'
+                      : event.target.value === 'genetic_algorithm'
+                        ? 'genetic_algorithm'
+                        : 'hill_climbing'
                   )
                 }
               >
                 <option value="hill_climbing">Hill Climbing</option>
                 <option value="simulated_annealing">Simulated Annealing</option>
+                <option value="genetic_algorithm">Genetic Algorithm</option>
               </select>
             </label>
             <div className="config-navigation" hidden={algorithm !== 'hill_climbing'}>
@@ -507,6 +520,13 @@ function App() {
                 config={config}
                 onPreview={setAnnealingPreview}
                 onRunningChange={setRunning}
+              />
+            </div>
+            <div hidden={algorithm !== 'genetic_algorithm'}>
+              <GeneticAlgorithmPanel
+                config={config}
+                onPreview={setGeneticPreview}
+                onRunningChange={handleGARunning}
               />
             </div>
           </div>
@@ -614,7 +634,7 @@ function App() {
                         <span className="vehicle-name">
                           <span
                             className="vehicle-dot"
-                            style={{ background: `hsl(${index * 67 + 165} 45% 35%)` }}
+                            style={{ background: vehicleColor(vehicle.id) }}
                           />
                           Vehicle {String(index + 1).padStart(2, '0')}
                         </span>

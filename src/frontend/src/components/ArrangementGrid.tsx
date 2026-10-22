@@ -1,4 +1,5 @@
 import type { Config } from '../types/config'
+import { vehicleColor } from './runView'
 
 export default function ArrangementGrid({
   config,
@@ -35,7 +36,7 @@ export default function ArrangementGrid({
                 top: `${(vehicle.y / ship.length) * 100}%`,
                 width: `${(vehicle.width / ship.width) * 100}%`,
                 height: `${(vehicle.length / ship.length) * 100}%`,
-                background: `hsl(${index * 67 + 165} 45% 35%)`,
+                background: vehicleColor(vehicle.id),
               }}
             >
               V{index + 1}

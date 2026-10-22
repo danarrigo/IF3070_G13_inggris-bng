@@ -161,7 +161,7 @@ function ShipBackground({
         scenario = updated
         scene.add(scenario)
         renderedConfig = next
-        if (!animate || !compatible) fitScene()
+        if (!compatible) fitScene()
       }
       if (!animate && transition) {
         transition(1)

@@ -3,6 +3,7 @@ import { test } from 'node:test'
 import * as THREE from 'three'
 import { buildScenario, disposeScenario, layoutVehicles } from '../src/components/scenarioScene.ts'
 import { createSceneTransition } from '../src/components/sceneTransition.ts'
+import { vehicleColor } from '../src/components/runView.ts'
 import type { Config } from '../src/types/config.ts'
 
 function config(): Config {
@@ -14,7 +15,7 @@ function config(): Config {
 }
 
 function body(scene: THREE.Group) {
-  const mesh = scene.getObjectByName('paint-165')
+  const mesh = scene.getObjectByName(`paint-${vehicleColor('a')}`)
   assert(mesh instanceof THREE.InstancedMesh)
   return mesh
 }
@@ -72,7 +73,7 @@ test('ghosts contain only changed cars, keep full staging coordinates, and relea
     ghost: true,
   })
   assert(ghost.children.every((object) => object instanceof THREE.InstancedMesh))
-  const paint = ghost.getObjectByName('paint-232')
+  const paint = ghost.getObjectByName(`paint-${vehicleColor('b')}`)
   assert(paint instanceof THREE.InstancedMesh)
   const actual = transform(paint).position
   const expected = layoutVehicles(source)[1]

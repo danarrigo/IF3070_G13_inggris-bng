@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { streamAnnealing, loadAnnealingRuns, saveRun } from '../api/annealing'
 import type { Config } from '../types/config'
 import { arrangementConfig } from '../types/run'
+import { vehicleColor } from './runView'
 import type { AnnealingSettings, Placement, SearchRun } from '../types/run'
 
 function Chart({
@@ -100,7 +101,7 @@ function Deck({ config }: { config: Config }) {
                 top: `${(v.y / config.ship.length) * 100}%`,
                 width: `${(v.width / config.ship.width) * 100}%`,
                 height: `${(v.length / config.ship.length) * 100}%`,
-                background: `hsl(${index * 67 + 165} 45% 35%)`,
+                background: vehicleColor(v.id),
               }}
             >
               V{index + 1}

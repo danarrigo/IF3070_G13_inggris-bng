@@ -18,9 +18,19 @@ def find_run_by_id(db: Database[dict[str, object]], run_id: UUID):
     return db["runs"].find_one({"_id": str(run_id)})
 
 
-def find_runs(db: Database[dict[str, object]], config_hash: str | None = None):
+def find_runs(
+    db: Database[dict[str, object]],
+    config_hash: str | None = None,
+    *,
+    include_trace: bool = True,
+):
     query = {} if config_hash is None else {"configHash": config_hash}
-    return list(db["runs"].find(query).sort("created_at", -1))
+    cursor = (
+        db["runs"].find(query)
+        if include_trace
+        else db["runs"].find(query, {"result.demo_trace": 0})
+    )
+    return list(cursor.sort("created_at", -1))
 
 
 def delete_run_by_id(db: Database[dict[str, object]], run_id: UUID):
