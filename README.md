@@ -48,9 +48,44 @@ npm ci
 npm run dev
 ```
 
-Open the URL printed by Vite (usually http://localhost:5173). The scenario editor supports ship settings, a vehicle count with configurable random ranges (length, width, weight, shipping fee, and ETA), individual vehicle edits, an initial-arrangement grid preview, and saving/loading the main config. Generate creates unplaced vehicles; regenerating asks before replacing existing edits. Saving preserves the generated vehicles, not the generation controls. Start MongoDB and the backend to use save/load; editing and previewing work locally. The **Use custom starting positions** toggle is saved with the config as `preserve_positions`. Off (default) randomizes all positions and disables X/Y editing; on preserves filled X/Y pairs and randomizes vehicles without positions. Turning it off retains custom coordinates for later, but ignores them in the preview and initializer. Algorithm execution is not implemented yet.
+Open the URL printed by Vite (usually http://localhost:5173). The scenario editor supports ship settings, a vehicle count with configurable random ranges (length, width, weight, shipping fee, and ETA), individual vehicle edits, an initial-arrangement grid preview, and saving/loading the main config. Generate creates unplaced vehicles; regenerating asks before replacing existing edits. Saving preserves the generated vehicles, not the generation controls. Start MongoDB and the backend to use save/load; editing and previewing work locally. The **Use custom starting positions** toggle is saved with the config as `preserve_positions`. Off (default) randomizes all positions and disables X/Y editing; on preserves filled X/Y pairs and randomizes vehicles without positions. Turning it off retains custom coordinates for later, but ignores them in the preview and initializer. The config page contains configuration only. Use **Next: Optimization** to open the separate Steepest Ascent page; **Back to config** preserves the current draft and generation controls.
 
-Vite proxies `/api` requests to `http://127.0.0.1:8000`, so no development CORS configuration is needed.
+Vite proxies HTTP and WebSocket `/api` requests to `http://127.0.0.1:8000`, so no development CORS configuration is needed.
+
+## Running Steepest Ascent
+
+1. Configure or load a scenario and add vehicles on `/#config`.
+2. Click **Next: Optimization**. Invalid or incomplete config fields must be corrected before continuing.
+3. On `/#optimization`, set **Random seed** and **Max iterations** (1-10,000), then click **Run Steepest Ascent**. The backend executes the current draft snapshot and saves the completed run in MongoDB. Saving the main config first is not required, and running does not overwrite it.
+4. **Show every neighbor** is off by default: the scene moves directly to each completed iteration's chosen state, without best-so-far previews. Enable it to display each valid neighbor in order, without sampling or dropped frames. Amber wireframes identify the changed vehicles; the card shows the neighbor number, action, score, and whether it improves or ties the current/best score. Rejected previews never update the committed state or graph.
+5. Use **Slower** / **Faster** to change visualization speed from **0.25× to 8×**, including during a run. Vehicle transitions follow the same speed. Large neighborhoods take time to display; speed changes do not change search decisions. Reduced-motion mode disables interpolated movement, not individual neighbor previews.
+6. Use **Stop search** to cancel active work and pending playback. Disconnecting also cancels active computation. Partial runs are not saved; a run already saved before a disconnect remains stored.
+7. Review objective values, search duration, iteration count, loaded/unloaded counts, and the objective graph. **Initial state** / **Current state** are available during execution, then **Initial state** / **Final state** after completion. **Draft** shows the editor preview. **Download JSON** exports completed, saved runs.
+
+After optimization, use **Next: Results** to inspect **one run**: initial/final states, objective history, duration, iterations, and JSON export. Initial and final arrangements each have their own grid, shown together (stacked on small screens); the initial/final buttons independently control the 3D ship view. **Compare with** optionally adds one other MongoDB run with the exact same config hash to a side-by-side metrics table; it never replaces the primary result or ship view. Results is not an all-run history page.
+
+**Compare iteration** lets you revisit any completed scan, toggle **Before iteration** / **After iteration** in the 3D and grid views, and inspect the objective delta. No-improvement scans show identical states. This replay is captured from the live stream and retained for the current page session, including after completion or cancellation; saved run JSON still contains the initial/final arrangements and objective history, not per-iteration placements.
+
+Navigation uses browser history, so Back/Forward work without discarding the in-memory config draft, generator controls, algorithm settings, or completed result. Configuration always shows the draft arrangement, not the run's final state. Unsaved drafts do not survive a full browser refresh; use Save config before reloading.
+
+The non-streaming endpoint remains `POST /api/optimization/hill-climbing`, with `{ "config": { ... }, "random_seed": 42, "iterations": 100 }`. Other algorithm variants are not exposed yet.
+
+### WebSocket protocol
+
+Connect to `/api/optimization/hill-climbing/live` on the same host, then send the same execution request as the first JSON message. Add `"show_neighbors": true` to emit every valid neighbor (the API default is false). The frontend also sends `"acknowledge_progress": true` for lossless, paced delivery. One connection runs one search. Browser origins must match the request host.
+
+- `progress`: `phase` (`initial`, `candidate`, `best`, or `iteration`), `iteration`, `arrangement`, `objective`, `current_objective`, `neighbors_evaluated`, and `runtime_ms`. The initial event additionally includes the config snapshot. `candidate` describes a non-winning neighbor; `best` describes a strictly improving best-so-far candidate. Neither commits it. `initial` and `iteration` describe committed states.
+- `complete`: `run`, emitted only after persistence succeeds.
+- `cancelled`: cancellation confirmed, without saving a partial run.
+- `error`: `detail`, for invalid input, execution failure, or persistence failure.
+- Client control message: `{ "type": "cancel" }`.
+- With `acknowledge_progress` enabled, each progress event includes a `sequence` integer. After displaying that frame, send `{ "type": "ack", "sequence": 1 }` with its actual sequence. The server waits before sending the next progress event. Cancellation does not require acknowledging a pending frame.
+
+CPU search runs off the event loop. A bounded queue plus per-frame acknowledgements prevent unbounded buffering without dropping neighbors; visualization waits are excluded from reported search time. Backpressure may pause the worker while the viewer catches up, and cancellation is checked during initialization, neighborhood enumeration, scoring, and before persistence. The existing HTTP endpoint uses the same algorithm without streaming.
+
+The search rule remains strict Steepest Ascent: scan all valid neighbors, accept the highest objective only if it improves the current state, and stop at a local optimum or the requested iteration limit. Each iteration is one complete neighborhood scan, including the final no-improvement scan. Search time excludes database access, initial-state generation, and progress callback/delivery time. Large fleets/decks can be expensive because enumeration is exhaustive.
+
+New execution results store the actual initial/final placements and search metrics. Older manually saved runs can have null metadata rather than fabricated initial states.
 
 ## Search foundation and assignment status
 
@@ -60,17 +95,19 @@ The shared Python foundation supports rectangle validation, shipping-fee scoring
 - Moves can choose any fitting deck coordinate, not just an adjacent cell. Moving outside the ship unloads a vehicle.
 - Swaps exchange two loaded vehicles' anchors, or atomically replace a loaded vehicle with an unloaded one. Dimensions/orientation are retained for loaded vehicles and the whole result is validated.
 - Outside vehicles have no stored coordinates in the placement-list representation. Two unloaded vehicles swapping is therefore unchanged and skipped. An unloaded vehicle's orientation is chosen when entering the deck.
-- `prepare_run()` prepares a starting state only. No optimization algorithm or execution endpoint is implemented yet.
+- `prepare_run()` prepares a saved-config starting state; `prepare_config()` prepares an immutable request snapshot. The execution service passes that snapshot to the pure `steepest_ascent()` search and persists the result.
 
-Remaining assignment work includes Hill Climbing (at least one named variant), Simulated Annealing, Genetic Algorithm, and their execution/results UI. Completed runs must preserve actual initial/final arrangements and objective values, duration, iteration counts, and the required algorithm-specific data: SA's `exp(delta_E / T)` history/local-optimum frequency and GA's maximum/average population objective history. These metrics are not produced by the current foundation.
+Steepest Ascent now records initial/final arrangements, objective history, search duration, completed scans, and its stopping reason. Remaining work includes the other three HC variants for the bonus, Simulated Annealing, Genetic Algorithm, run comparisons, and the required algorithm-specific data: SA's `exp(delta_E / T)` history/local-optimum frequency and GA's maximum/average population objective history.
 
 Experiments require 3 Hill Climbing runs, 3 SA runs, and 18 GA runs (9 varying iterations at fixed population size plus 9 varying population size at fixed iterations). Submit the report and saved outputs, include the completed Generative AI Usage Form in the report, and publish a tagged GitHub release as required by the assignment.
 
 ## Checks
 
 ```bash
-(cd src/backend && uv run pytest)
-(cd src/frontend && npm run lint && npm test && npm run build)
+(cd src/backend && uv run ruff format --check . && uv run ruff check . && uv run basedpyright && uv run pytest)
+(cd src/frontend && npm run format:check && npm run lint && npm run typecheck && npm test && npm run build)
 ```
 
-For production, serve `src/frontend/dist` with a static web server and route `/api` to the FastAPI service. Vite's development proxy does not apply to production builds. Run the backend with `uv run fastapi run main.py` from `src/backend`.
+Backend application modules use strict type checking; tests use standard checking to accommodate dynamic mocks. Apply formatting with `uv run ruff format .` in `src/backend` and `npm run format` in `src/frontend`.
+
+For production, serve `src/frontend/dist` with a static web server and route `/api` to the FastAPI service, including WebSocket upgrade support and the original Host header. Vite's development proxy does not apply to production builds. Run the backend with `uv run fastapi run main.py` from `src/backend`.
