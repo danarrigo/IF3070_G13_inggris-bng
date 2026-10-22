@@ -38,7 +38,7 @@ export function compareIteration(
   const state = new Map(initial.map((item) => [item.vehicle_id, item]))
   let objective = initialObjective
   for (const change of changes) {
-    const before = change.iteration === target ? [...state.values()] : null
+    const before = change.kind !== 'restart' && change.iteration === target ? [...state.values()] : null
     for (const id of change.removed_vehicle_ids) state.delete(id)
     for (const item of change.updated) state.set(item.vehicle_id, item)
     if (before)

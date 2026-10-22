@@ -1,16 +1,25 @@
 from datetime import UTC, datetime
-from typing import Literal
+from typing import Annotated, Literal
 from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
 
 from models.config import ConfigModel
 
+type HillClimbingVariant = Literal[
+    "steepest_ascent", "stochastic", "sideways", "random_restart"
+]
+type HillClimbingStopReason = Literal[
+    "local_optimum", "iteration_limit", "sideways_limit", "restart_limit"
+]
+
 
 class HillClimbingSettings(BaseModel):
     algorithm: Literal["hill_climbing"]
     iterations: int = Field(gt=0)
-    variant: Literal["steepest_ascent"] = "steepest_ascent"
+    variant: HillClimbingVariant = "steepest_ascent"
+    max_sideways: int = Field(default=100, ge=0, le=10000)
+    max_restart: int = Field(default=10, ge=0, le=1000)
 
 
 class SimulatedAnnealingSettings(BaseModel):
@@ -51,7 +60,10 @@ class RunResult(BaseModel):
     initial_arrangement: list[VehiclePlacement] | None = None
     iterations_completed: int | None = Field(default=None, ge=0)
     neighbors_evaluated: int | None = Field(default=None, ge=0)
-    stop_reason: Literal["local_optimum", "iteration_limit"] | None = None
+    stop_reason: HillClimbingStopReason | None = None
+    sideways_moves: int | None = Field(default=None, ge=0)
+    restarts_completed: int | None = Field(default=None, ge=0)
+    iterations_per_restart: list[Annotated[int, Field(ge=0)]] | None = None
 
 
 class RunModel(BaseModel):

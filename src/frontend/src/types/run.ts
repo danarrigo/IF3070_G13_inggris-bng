@@ -13,7 +13,25 @@ export interface ObjectivePoint {
   objective: number
 }
 
-export interface SteepestAscentRun {
+export const hillClimbingLabels = {
+  steepest_ascent: 'Steepest Ascent',
+  stochastic: 'Stochastic',
+  sideways: 'Sideways Move',
+  random_restart: 'Random Restart',
+}
+export type HillClimbingVariant = keyof typeof hillClimbingLabels
+export function isHillClimbingVariant(value: unknown): value is HillClimbingVariant {
+  return typeof value === 'string' && Object.hasOwn(hillClimbingLabels, value)
+}
+export const hillClimbingStopLabels = {
+  local_optimum: 'No improving neighbor remains.',
+  iteration_limit: 'Total iteration limit reached.',
+  sideways_limit: 'Consecutive sideways-move limit reached.',
+  restart_limit: 'Restart limit reached; returning the best state found.',
+}
+export type HillClimbingStopReason = keyof typeof hillClimbingStopLabels
+
+export interface HillClimbingRun {
   id: string
   created_at: string
   config: Config
@@ -21,8 +39,10 @@ export interface SteepestAscentRun {
   random_seed: number
   settings: {
     algorithm: 'hill_climbing'
-    variant: 'steepest_ascent'
+    variant: HillClimbingVariant
     iterations: number
+    max_sideways?: number
+    max_restart?: number
   }
   result: {
     initial_arrangement: VehiclePlacement[]
@@ -34,12 +54,17 @@ export interface SteepestAscentRun {
     runtime_ms: number
     iterations_completed: number
     neighbors_evaluated: number
-    stop_reason: 'local_optimum' | 'iteration_limit'
+    stop_reason: HillClimbingStopReason
+    sideways_moves?: number
+    restarts_completed?: number
+    iterations_per_restart?: number[]
   }
 }
 
+export type SteepestAscentRun = HillClimbingRun
+
 export interface SearchProgress {
-  phase: 'initial' | 'candidate' | 'best' | 'iteration'
+  phase: 'initial' | 'candidate' | 'best' | 'iteration' | 'restart'
   iteration: number
   objective: number
   current_objective: number
@@ -47,9 +72,13 @@ export interface SearchProgress {
   neighbors_evaluated: number
   runtime_ms: number
   config?: Config
+  variant?: HillClimbingVariant
+  restarts_completed?: number
+  sideways_moves?: number
 }
 
 export interface IterationChange {
+  kind?: 'iteration' | 'restart'
   iteration: number
   objective: number
   updated: VehiclePlacement[]
@@ -57,6 +86,7 @@ export interface IterationChange {
 }
 
 export interface IterationComparison {
+  state_changed: boolean
   iteration: number
   before: VehiclePlacement[]
   after: VehiclePlacement[]
@@ -71,6 +101,9 @@ export interface NeighborPreview {
 }
 
 export interface LiveRun {
+  variant: HillClimbingVariant
+  restarts_completed: number
+  sideways_moves: number
   config: Config
   random_seed: number
   initial_arrangement: VehiclePlacement[]

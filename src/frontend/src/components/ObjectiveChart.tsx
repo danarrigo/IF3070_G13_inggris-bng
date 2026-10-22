@@ -42,9 +42,9 @@ function ObjectiveChart({ history }: { history: ObjectivePoint[] }) {
           strokeWidth="2"
           strokeLinejoin="round"
         />
-        {history.map((point) => (
+        {history.map((point, index) => (
           <circle
-            key={point.iteration}
+            key={`${point.iteration}-${index}`}
             cx={x(point.iteration)}
             cy={y(point.objective)}
             r={2.5}

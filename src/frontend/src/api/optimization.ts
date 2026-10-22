@@ -1,7 +1,9 @@
 import { parseConfig } from './config.ts'
 import { iterationChange } from '../iterationHistory.ts'
+import { hillClimbingStopLabels, isHillClimbingVariant } from '../types/run.ts'
 import type { Config } from '../types/config.ts'
 import type {
+  HillClimbingStopReason,
   LiveRun,
   ObjectivePoint,
   SearchProgress,
@@ -32,6 +34,10 @@ function objectivePoint(value: unknown): value is ObjectivePoint {
   return record(value) && integer(value.iteration) && integer(value.objective)
 }
 
+function stopReason(value: unknown): value is HillClimbingStopReason {
+  return typeof value === 'string' && Object.hasOwn(hillClimbingStopLabels, value)
+}
+
 export function parseRun(data: unknown): SteepestAscentRun {
   if (
     !record(data) ||
@@ -41,7 +47,9 @@ export function parseRun(data: unknown): SteepestAscentRun {
     !integer(data.random_seed, -Number.MAX_SAFE_INTEGER) ||
     !record(data.settings) ||
     data.settings.algorithm !== 'hill_climbing' ||
-    data.settings.variant !== 'steepest_ascent' ||
+    !isHillClimbingVariant(data.settings.variant) ||
+    (data.settings.max_sideways != null && !integer(data.settings.max_sideways)) ||
+    (data.settings.max_restart != null && !integer(data.settings.max_restart)) ||
     !integer(data.settings.iterations, 1) ||
     !record(data.result)
   )
@@ -64,7 +72,10 @@ export function parseRun(data: unknown): SteepestAscentRun {
     result.runtime_ms < 0 ||
     !integer(result.iterations_completed) ||
     !integer(result.neighbors_evaluated) ||
-    (result.stop_reason !== 'local_optimum' && result.stop_reason !== 'iteration_limit')
+    !stopReason(result.stop_reason) ||
+    (result.sideways_moves != null && !integer(result.sideways_moves)) ||
+    (result.restarts_completed != null && !integer(result.restarts_completed)) ||
+    (result.iterations_per_restart != null && (!Array.isArray(result.iterations_per_restart) || !result.iterations_per_restart.every((count: unknown) => integer(count))))
   ) {
     throw new Error('The backend returned incomplete run results.')
   }
@@ -76,8 +87,10 @@ export function parseRun(data: unknown): SteepestAscentRun {
     random_seed: data.random_seed,
     settings: {
       algorithm: 'hill_climbing',
-      variant: 'steepest_ascent',
+      variant: data.settings.variant,
       iterations: data.settings.iterations,
+      ...(data.settings.max_sideways != null ? { max_sideways: data.settings.max_sideways } : {}),
+      ...(data.settings.max_restart != null ? { max_restart: data.settings.max_restart } : {}),
     },
     result: {
       initial_arrangement: result.initial_arrangement,
@@ -90,6 +103,9 @@ export function parseRun(data: unknown): SteepestAscentRun {
       iterations_completed: result.iterations_completed,
       neighbors_evaluated: result.neighbors_evaluated,
       stop_reason: result.stop_reason,
+      ...(result.sideways_moves != null ? { sideways_moves: result.sideways_moves } : {}),
+      ...(result.restarts_completed != null ? { restarts_completed: result.restarts_completed } : {}),
+      ...(result.iterations_per_restart != null ? { iterations_per_restart: result.iterations_per_restart } : {}),
     },
   }
 }
@@ -97,7 +113,7 @@ export function parseRun(data: unknown): SteepestAscentRun {
 export function parseProgress(data: unknown): SearchProgress {
   if (
     !record(data) ||
-    !['initial', 'candidate', 'best', 'iteration'].includes(String(data.phase)) ||
+    !['initial', 'candidate', 'best', 'iteration', 'restart'].includes(String(data.phase)) ||
     !integer(data.iteration) ||
     !integer(data.objective) ||
     !integer(data.current_objective) ||
@@ -111,7 +127,7 @@ export function parseProgress(data: unknown): SearchProgress {
     throw new Error('Invalid live search update.')
   }
   const phase = data.phase
-  if (phase !== 'initial' && phase !== 'candidate' && phase !== 'best' && phase !== 'iteration')
+  if (phase !== 'initial' && phase !== 'candidate' && phase !== 'best' && phase !== 'iteration' && phase !== 'restart')
     throw new Error('Invalid search phase.')
   return {
     phase,
@@ -122,6 +138,9 @@ export function parseProgress(data: unknown): SearchProgress {
     neighbors_evaluated: data.neighbors_evaluated,
     runtime_ms: data.runtime_ms,
     config: phase === 'initial' ? parseConfig(data.config) : undefined,
+    variant: isHillClimbingVariant(data.variant) ? data.variant : undefined,
+    restarts_completed: integer(data.restarts_completed) ? data.restarts_completed : 0,
+    sideways_moves: integer(data.sideways_moves) ? data.sideways_moves : 0,
   }
 }
 
@@ -139,6 +158,9 @@ export function advanceLiveRun(
     )
       throw new Error('Invalid initial search update.')
     return {
+      variant: update.variant ?? 'steepest_ascent',
+      restarts_completed: 0,
+      sideways_moves: 0,
       config: update.config,
       random_seed: seed,
       initial_arrangement: update.arrangement,
@@ -155,6 +177,19 @@ export function advanceLiveRun(
       neighbors_evaluated: update.neighbors_evaluated,
       runtime_ms: update.runtime_ms,
       phase: update.phase,
+    }
+  }
+  if (update.phase === 'restart') {
+    if (!previous || previous.variant !== 'random_restart' || update.iteration !== previous.iteration
+      || update.restarts_completed !== previous.restarts_completed + 1 || update.current_objective !== update.objective)
+      throw new Error('Invalid restart update.')
+    return {
+      ...previous, phase: update.phase, arrangement: update.arrangement, objective: update.objective,
+      restarts_completed: update.restarts_completed, evaluating_iteration: update.iteration + 1,
+      best_candidate: null, best_objective: null, neighbor_preview: null,
+      iteration_changes: [...previous.iteration_changes, { ...iterationChange(previous.arrangement, update.arrangement, update.iteration, update.objective), kind: 'restart' }],
+      objective_history: [...previous.objective_history, { iteration: update.iteration, objective: update.objective }],
+      neighbors_evaluated: update.neighbors_evaluated, runtime_ms: update.runtime_ms,
     }
   }
   if (!previous || update.iteration !== previous.iteration + 1)
@@ -201,12 +236,15 @@ export function advanceLiveRun(
   }
   if (
     update.current_objective !== update.objective ||
-    update.objective !== (previous.best_objective ?? previous.objective)
+    (previous.variant === 'stochastic'
+      ? update.objective < previous.objective || update.objective > (previous.best_objective ?? previous.objective)
+      : update.objective !== (previous.best_objective ?? previous.objective))
   )
     throw new Error('Invalid committed-state update.')
   return {
     ...previous,
     phase: update.phase,
+    sideways_moves: update.sideways_moves ?? previous.sideways_moves,
     arrangement: update.arrangement,
     objective: update.objective,
     iteration: update.iteration,

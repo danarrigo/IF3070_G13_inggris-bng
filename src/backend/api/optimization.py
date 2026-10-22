@@ -13,9 +13,9 @@ from pymongo.errors import PyMongoError
 from algorithms.cancellation import SearchCancelled, check_cancellation
 from algorithms.hill_climbing import SearchProgress
 from core.database import DatabaseDep
-from dtos.optimization import SteepestAscentRequest
+from dtos.optimization import HillClimbingRequest
 from models.run import RunModel
-from services.optimization_service import execute_steepest_ascent
+from services.optimization_service import execute_hill_climbing
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -24,9 +24,9 @@ logger = logging.getLogger(__name__)
 @router.post(
     "/api/optimization/hill-climbing", response_model=RunModel, status_code=201
 )
-def run_steepest_ascent(request: SteepestAscentRequest, db: DatabaseDep) -> RunModel:
+def run_hill_climbing(request: HillClimbingRequest, db: DatabaseDep) -> RunModel:
     try:
-        return execute_steepest_ascent(db, request)
+        return execute_hill_climbing(db, request)
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
     except PyMongoError as exc:
@@ -36,7 +36,7 @@ def run_steepest_ascent(request: SteepestAscentRequest, db: DatabaseDep) -> RunM
 
 
 @router.websocket("/api/optimization/hill-climbing/live")
-async def live_steepest_ascent(websocket: WebSocket, db: DatabaseDep) -> None:
+async def live_hill_climbing(websocket: WebSocket, db: DatabaseDep) -> None:
     origin = websocket.headers.get("origin")
     if origin is not None and urlsplit(origin).netloc != websocket.headers.get("host"):
         await websocket.close(code=1008)
@@ -44,7 +44,7 @@ async def live_steepest_ascent(websocket: WebSocket, db: DatabaseDep) -> None:
     await websocket.accept()
     try:
         raw = cast(object, await websocket.receive_json())
-        request = SteepestAscentRequest.model_validate(raw)
+        request = HillClimbingRequest.model_validate(raw)
     except WebSocketDisconnect:
         return
     except (ValidationError, ValueError):
@@ -74,9 +74,12 @@ async def live_steepest_ascent(websocket: WebSocket, db: DatabaseDep) -> None:
             ],
             "neighbors_evaluated": progress.neighbors_evaluated,
             "runtime_ms": progress.runtime_ms,
+            "restarts_completed": progress.restarts_completed,
+            "sideways_moves": progress.sideways_moves,
         }
         if progress.phase == "initial":
             event["config"] = request.config.model_dump(mode="json")
+            event["variant"] = request.variant
         future = asyncio.run_coroutine_threadsafe(queue.put(event), loop)
         try:
             while True:
@@ -94,7 +97,7 @@ async def live_steepest_ascent(websocket: WebSocket, db: DatabaseDep) -> None:
         terminal: dict[str, object]
         try:
             run = await asyncio.to_thread(
-                execute_steepest_ascent,
+                execute_hill_climbing,
                 db,
                 request,
                 on_progress=report,

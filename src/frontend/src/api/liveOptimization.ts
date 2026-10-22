@@ -9,13 +9,14 @@ export class RunCancelledError extends Error {
   }
 }
 
-export function executeSteepestAscentLive(
+export function executeHillClimbingLive(
   config: Config,
   randomSeed: number,
   iterations: number,
   onProgress: (live: LiveRun) => void | Promise<void>,
   signal: AbortSignal,
-  showNeighbors = false
+  showNeighbors = false,
+  settings: Pick<SteepestAscentRun['settings'], 'variant' | 'max_sideways' | 'max_restart'> = { variant: 'steepest_ascent' }
 ): Promise<SteepestAscentRun> {
   if (signal.aborted) return Promise.reject(new RunCancelledError())
   const payload = JSON.stringify({
@@ -24,6 +25,7 @@ export function executeSteepestAscentLive(
     iterations,
     show_neighbors: showNeighbors,
     acknowledge_progress: true,
+    ...settings,
   })
   return new Promise((resolve, reject) => {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'

@@ -177,7 +177,7 @@ def test_cancel_or_disconnect_signals_worker_and_never_saves_partial_run(
         stopped.set()
         raise SearchCancelled()
 
-    monkeypatch.setattr("api.optimization.execute_steepest_ascent", wait_for_cancel)
+    monkeypatch.setattr("api.optimization.execute_hill_climbing", wait_for_cancel)
     app.dependency_overrides[get_database] = lambda: db
     try:
         with TestClient(app) as client:
