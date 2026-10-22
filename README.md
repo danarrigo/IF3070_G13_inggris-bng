@@ -56,7 +56,7 @@ Vite proxies HTTP and WebSocket `/api` requests to `http://127.0.0.1:8000`, so n
 
 1. Configure or load a scenario and add vehicles on `/#config`.
 2. Click **Next: Optimization**. Invalid or incomplete config fields must be corrected before continuing.
-3. On `/#optimization`, set **Random seed** and **Max iterations** (1-10,000), then click **Run Steepest Ascent**. The backend executes the current draft snapshot and saves the completed run in MongoDB. Saving the main config first is not required, and running does not overwrite it.
+3. On `/#optimization`, select **Hill Climbing** under Algorithm, then choose **Steepest Ascent**, **Stochastic**, **Sideways Move**, or **Random Restart**. Set **Random seed** and **Max iterations** (1-10,000). Sideways exposes **Max sideways moves**; Random Restart exposes **Max restarts**, with the iteration budget shared across all attempts. Click the selected variant's Run button. The backend executes the current draft snapshot and saves the completed run in MongoDB. Saving the main config first is not required, and running does not overwrite it.
 4. **Show every neighbor** is off by default: the scene moves directly to each completed iteration's chosen state, without best-so-far previews. Enable it to display each valid neighbor in order, without sampling or dropped frames. Amber wireframes identify the changed vehicles; the card shows the neighbor number, action, score, and whether it improves or ties the current/best score. Rejected previews never update the committed state or graph.
 5. Use **Slower** / **Faster** to change visualization speed from **0.25× to 8×**, including during a run. Vehicle transitions follow the same speed. Large neighborhoods take time to display; speed changes do not change search decisions. Reduced-motion mode disables interpolated movement, not individual neighbor previews.
 6. Use **Stop search** to cancel active work and pending playback. Disconnecting also cancels active computation. Partial runs are not saved; a run already saved before a disconnect remains stored.
@@ -68,7 +68,7 @@ After optimization, use **Next: Results** to inspect **one run**: initial/final 
 
 Navigation uses browser history, so Back/Forward work without discarding the in-memory config draft, generator controls, algorithm settings, or completed result. Configuration always shows the draft arrangement, not the run's final state. Unsaved drafts do not survive a full browser refresh; use Save config before reloading.
 
-The non-streaming endpoint remains `POST /api/optimization/hill-climbing`, with `{ "config": { ... }, "random_seed": 42, "iterations": 100 }`. Other algorithm variants are not exposed yet.
+The non-streaming endpoint remains `POST /api/optimization/hill-climbing`, with `{ "config": { ... }, "random_seed": 42, "iterations": 100 }`. Set `variant` to `steepest_ascent` (default), `stochastic`, `sideways`, or `random_restart`; optional `max_sideways` and `max_restart` configure their limits. Stochastic weights improving neighbors by their score increase. Random Restart returns the best state across attempts and records restart counts plus iterations per attempt.
 
 ### WebSocket protocol
 
@@ -97,7 +97,7 @@ The shared Python foundation supports rectangle validation, shipping-fee scoring
 - Outside vehicles have no stored coordinates in the placement-list representation. Two unloaded vehicles swapping is therefore unchanged and skipped. An unloaded vehicle's orientation is chosen when entering the deck.
 - `prepare_run()` prepares a saved-config starting state; `prepare_config()` prepares an immutable request snapshot. The execution service passes that snapshot to the pure `steepest_ascent()` search and persists the result.
 
-Steepest Ascent now records initial/final arrangements, objective history, search duration, completed scans, and its stopping reason. Remaining work includes the other three HC variants for the bonus, Simulated Annealing, Genetic Algorithm, run comparisons, and the required algorithm-specific data: SA's `exp(delta_E / T)` history/local-optimum frequency and GA's maximum/average population objective history.
+All four HC variants are available through the API and FE. Results label the actual variant, include sideways/restart metrics when applicable, and compare variants only across identical config snapshots. SA and GA have their own panels in the Algorithm selector, including their experiment plots. Remaining assignment work includes completing and reviewing the required experiments, comparison analysis, report, and release.
 
 Experiments require 3 Hill Climbing runs, 3 SA runs, and 18 GA runs (9 varying iterations at fixed population size plus 9 varying population size at fixed iterations). Submit the report and saved outputs, include the completed Generative AI Usage Form in the report, and publish a tagged GitHub release as required by the assignment.
 

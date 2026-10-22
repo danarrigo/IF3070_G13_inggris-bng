@@ -2,7 +2,14 @@ import { useEffect, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import { executeHillClimbingLive, RunCancelledError } from '../api/liveOptimization'
 import type { Config } from '../types/config'
-import type { IterationComparison, LiveRun, SceneView, SteepestAscentRun } from '../types/run'
+import type {
+  HillClimbingVariant,
+  IterationComparison,
+  LiveRun,
+  SceneView,
+  SteepestAscentRun,
+} from '../types/run'
+import { hillClimbingLabels, hillClimbingStopLabels, isHillClimbingVariant } from '../types/run'
 import ObjectiveChart from './ObjectiveChart'
 import DownloadRunButton from './DownloadRunButton'
 import { describeNeighbor, sameConfig } from './runPresentation'
@@ -45,6 +52,9 @@ function SteepestAscentPanel({
 }) {
   const [seed, setSeed] = useState<number | null>(42)
   const [iterations, setIterations] = useState<number | null>(100)
+  const [variant, setVariant] = useState<HillClimbingVariant>('steepest_ascent')
+  const [maxSideways, setMaxSideways] = useState<number | null>(100)
+  const [maxRestart, setMaxRestart] = useState<number | null>(10)
   const [running, setRunning] = useState(false)
   const [showNeighbors, setShowNeighbors] = useState(false)
   const [cancelling, setCancelling] = useState(false)
@@ -71,7 +81,13 @@ function SteepestAscentPanel({
       setError('Fix the configuration fields before starting the run.')
       return
     }
-    if (seed === null || iterations === null) return
+    if (
+      seed === null ||
+      iterations === null ||
+      (variant === 'sideways' && maxSideways === null) ||
+      (variant === 'random_restart' && maxRestart === null)
+    )
+      return
     const controller = new AbortController()
     controllerRef.current = controller
     setCancelling(false)
@@ -94,7 +110,8 @@ function SteepestAscentPanel({
           return playback.push(frame)
         },
         controller.signal,
-        showNeighbors
+        showNeighbors,
+        { variant, max_sideways: maxSideways ?? 100, max_restart: maxRestart ?? 10 }
       )
       await playback.drain()
       if (mounted.current) onComplete(completed)
@@ -138,11 +155,14 @@ function SteepestAscentPanel({
         : preview.objective < live.objective
           ? 'Worse than current'
           : preview.objective === live.objective
-            ? 'Equal to current; not improving'
+            ? live.variant === 'sideways'
+              ? 'Equal score; eligible sideways move'
+              : 'Equal to current; not improving'
             : preview.objective === live.best_objective
-              ? 'Ties best so far; not selected'
+              ? 'Ties the best score in this scan'
               : 'Improves current, but below best so far'
       : ''
+  const displayVariant = run?.settings.variant ?? live?.variant ?? variant
   const snapshot = run?.config ?? live?.config
   const changed = snapshot !== undefined && !sameConfig(snapshot, config)
   const initialObjective = run?.result.initial_objective ?? live?.initial_objective ?? 0
@@ -159,8 +179,8 @@ function SteepestAscentPanel({
   return (
     <section className="panel optimization-panel" aria-labelledby="optimization-heading">
       <div className="section-heading">
-        <h2 id="optimization-heading">Steepest Ascent</h2>
-        <span className="unit-tag">Hill Climbing</span>
+        <h2 id="optimization-heading">Hill Climbing</h2>
+        <span className="unit-tag">{hillClimbingLabels[variant]}</span>
       </div>
       <form
         onSubmit={(event) => {
@@ -169,6 +189,22 @@ function SteepestAscentPanel({
         className="optimization-form"
       >
         <fieldset disabled={running} className="run-controls">
+          <label className="number-field saved-run-picker hc-variant">
+            <span>Hill Climbing variant</span>
+            <select
+              aria-label="Hill Climbing variant"
+              value={variant}
+              onChange={(event) => {
+                if (isHillClimbingVariant(event.target.value)) setVariant(event.target.value)
+              }}
+            >
+              {Object.entries(hillClimbingLabels).map(([key, label]) => (
+                <option key={key} value={key}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </label>
           <div className="optimization-fields">
             <label className="number-field">
               <span>Random seed</span>
@@ -198,7 +234,34 @@ function SteepestAscentPanel({
                 }
               />
             </label>
+            {(variant === 'sideways' || variant === 'random_restart') && (
+              <label className="number-field">
+                <span>{variant === 'sideways' ? 'Max sideways moves' : 'Max restarts'}</span>
+                <input
+                  type="number"
+                  min={0}
+                  max={variant === 'sideways' ? 10000 : 1000}
+                  step={1}
+                  required
+                  value={(variant === 'sideways' ? maxSideways : maxRestart) ?? ''}
+                  onChange={(event) => {
+                    const value = event.target.value === '' ? null : event.target.valueAsNumber
+                    if (variant === 'sideways') setMaxSideways(value)
+                    else setMaxRestart(value)
+                  }}
+                />
+              </label>
+            )}
           </div>
+          <p className="field-hint">
+            {variant === 'stochastic'
+              ? 'Randomly chooses an improving neighbor, weighted by its improvement. It need not choose the maximum.'
+              : variant === 'sideways'
+                ? 'Allows equal-score moves up to the consecutive sideways limit; improvement resets the counter.'
+                : variant === 'random_restart'
+                  ? 'Restarts from fresh random states and returns the best found. Max iterations is the total budget across all attempts.'
+                  : 'Chooses the highest-scoring neighbor only when it strictly improves the current state.'}
+          </p>
           <label className="neighbor-exploration">
             <input
               type="checkbox"
@@ -218,7 +281,9 @@ function SteepestAscentPanel({
             className="primary run-button"
             disabled={running || config.vehicles.length === 0}
           >
-            {running ? 'Running Steepest Ascent...' : 'Run Steepest Ascent'}
+            {running
+              ? `Running ${hillClimbingLabels[variant]}...`
+              : `Run ${hillClimbingLabels[variant]}`}
           </button>
         </fieldset>
       </form>
@@ -274,9 +339,11 @@ function SteepestAscentPanel({
         </p>
       )}
       {(run || live) && snapshot && (
-        <div className="run-results" role="region" aria-label="Steepest Ascent results">
+        <div className="run-results" role="region" aria-label="Hill Climbing results">
           <div className="section-heading">
-            <h3>{run ? 'Run results' : 'Search visualization'}</h3>
+            <h3>
+              {hillClimbingLabels[displayVariant]} {run ? 'results' : 'visualization'}
+            </h3>
             <span className="saved-label">
               {run
                 ? 'Saved'
@@ -324,11 +391,13 @@ function SteepestAscentPanel({
                   }
                 >
                   <option value="latest">Latest completed iteration ({live.iteration})</option>
-                  {live.iteration_changes.map((change) => (
-                    <option key={change.iteration} value={change.iteration}>
-                      Iteration {change.iteration}
-                    </option>
-                  ))}
+                  {live.iteration_changes
+                    .filter((change) => change.kind !== 'restart')
+                    .map((change) => (
+                      <option key={change.iteration} value={change.iteration}>
+                        Iteration {change.iteration}
+                      </option>
+                    ))}
                 </select>
               </label>
               <div className="iteration-objective" aria-live="polite">
@@ -339,7 +408,9 @@ function SteepestAscentPanel({
                 <strong>
                   {comparison.after_objective > comparison.before_objective
                     ? `+${(comparison.after_objective - comparison.before_objective).toLocaleString()}`
-                    : 'No improvement'}
+                    : comparison.state_changed
+                      ? 'Sideways move'
+                      : 'No improvement'}
                 </strong>
               </div>
               <div
@@ -361,7 +432,9 @@ function SteepestAscentPanel({
               <p className="field-hint">
                 Iteration {comparison.iteration}.{' '}
                 {comparison.before_objective === comparison.after_objective
-                  ? 'No better neighbor was found; both states are identical.'
+                  ? comparison.state_changed
+                    ? 'Sideways move: the arrangement changed, but the objective stayed equal.'
+                    : 'No better neighbor was found; both states are identical.'
                   : 'Compare the state entering this scan with its chosen state.'}
               </p>
             </section>
@@ -419,12 +492,25 @@ function SteepestAscentPanel({
               </dd>
             </div>
           </dl>
+          {displayVariant === 'sideways' && (
+            <p className="field-hint">
+              Sideways moves: {run?.result.sideways_moves ?? live?.sideways_moves ?? 'Unavailable'}.
+            </p>
+          )}
+          {displayVariant === 'random_restart' && (
+            <p className="field-hint">
+              Restarts completed:{' '}
+              {run?.result.restarts_completed ?? live?.restarts_completed ?? 'Unavailable'}. The
+              chart follows the search; a restart can lower its score. The final result returns the
+              best state across all attempts.
+              {run?.result.iterations_per_restart &&
+                ` Scans per attempt (initial first): ${run.result.iterations_per_restart.join(', ')}.`}
+            </p>
+          )}
           <ObjectiveChart history={history} />
           <p className="field-hint">
             {run
-              ? run.result.stop_reason === 'local_optimum'
-                ? 'Stopped: no strictly better neighbor.'
-                : 'Stopped: iteration limit reached.'
+              ? `Stopped: ${hillClimbingStopLabels[run.result.stop_reason]}`
               : `${evaluated.toLocaleString()} neighbors evaluated so far.`}{' '}
             {run &&
               `${evaluated.toLocaleString()} neighbors evaluated. Iterations include the final no-improvement scan.`}

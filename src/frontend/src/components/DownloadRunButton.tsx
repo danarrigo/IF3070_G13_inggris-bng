@@ -7,7 +7,7 @@ export default function DownloadRunButton({ run }: { run: SteepestAscentRun }) {
     )
     const link = document.createElement('a')
     link.href = url
-    link.download = `steepest-ascent-${run.id}.json`
+    link.download = `${run.settings.variant.replaceAll('_', '-')}-${run.id}.json`
     link.click()
     window.setTimeout(() => URL.revokeObjectURL(url), 0)
   }

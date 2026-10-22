@@ -150,6 +150,82 @@ test('playback shows every candidate and best-so-far frame without coalescing', 
   playback.dispose()
 })
 
+test('stochastic accepts an improving choice below the scanned maximum', () => {
+  const update = initial()
+  update.config!.vehicles.push({ ...update.config!.vehicles[1], id: 'c', shipping_fee: 20 })
+  const first = advanceLiveRun(null, { ...update, variant: 'stochastic' }, 42)
+  const highest = advanceLiveRun(first, best(), 42)
+  const accepted = advanceLiveRun(
+    highest,
+    {
+      ...best(),
+      phase: 'iteration',
+      objective: 20,
+      current_objective: 20,
+      arrangement: [{ ...best().arrangement[0], vehicle_id: 'c' }],
+    },
+    42
+  )
+  assert.equal(accepted.objective, 20)
+  assert.equal(accepted.arrangement[0].vehicle_id, 'c')
+})
+
+test('restart resets the current state while retaining correct before/after replay', () => {
+  const first = advanceLiveRun(null, { ...initial(), variant: 'random_restart' }, 42)
+  const highest = advanceLiveRun(first, best(), 42)
+  const committed = advanceLiveRun(
+    highest,
+    { ...best(), phase: 'iteration', current_objective: 30 },
+    42
+  )
+  const restarted = advanceLiveRun(
+    committed,
+    { ...initial(), phase: 'restart', iteration: 1, restarts_completed: 1 },
+    42
+  )
+  const nextBest = advanceLiveRun(restarted, { ...best(), iteration: 2, restarts_completed: 1 }, 42)
+  const next = advanceLiveRun(
+    nextBest,
+    { ...best(), phase: 'iteration', iteration: 2, current_objective: 30, restarts_completed: 1 },
+    42
+  )
+  assert.equal(next.restarts_completed, 1)
+  assert.deepEqual(
+    next.objective_history.map((point) => point.objective),
+    [10, 30, 10, 30]
+  )
+  const replay = compareIteration(
+    next.initial_arrangement,
+    next.initial_objective,
+    next.iteration_changes,
+    2
+  )
+  assert(replay)
+  assert.equal(replay.before[0].vehicle_id, 'a')
+  assert.equal(replay.after[0].vehicle_id, 'b')
+  assert.equal(next.iteration_changes.filter((change) => change.kind !== 'restart').length, 2)
+})
+
+test('sideways replay distinguishes equal scores from identical arrangements', () => {
+  const update = initial()
+  update.config!.vehicles[1].shipping_fee = 10
+  const first = advanceLiveRun(null, { ...update, variant: 'sideways' }, 42)
+  const next = advanceLiveRun(
+    first,
+    { ...best(), phase: 'iteration', objective: 10, current_objective: 10, sideways_moves: 1 },
+    42
+  )
+  const replay = compareIteration(
+    next.initial_arrangement,
+    next.initial_objective,
+    next.iteration_changes,
+    1
+  )
+  assert.equal(next.sideways_moves, 1)
+  assert.equal(replay?.state_changed, true)
+  assert.equal(replay?.before_objective, replay?.after_objective)
+})
+
 test('rejects malformed, regressing, or out-of-order updates', () => {
   assert.throws(() => parseProgress({ ...best(), runtime_ms: -1 }))
   assert.throws(() => parseProgress({ ...best(), phase: 'unknown' }))

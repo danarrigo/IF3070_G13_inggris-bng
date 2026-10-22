@@ -46,6 +46,28 @@ test('saved results retain complete runs and disclose unsupported or legacy reco
   assert.deepEqual(parseSavedRuns([]), { runs: [], unavailable: 0 })
 })
 
+test('saved results support all four hill climbing variants and their metadata', () => {
+  const base = savedRun()
+  const variants = ['steepest_ascent', 'stochastic', 'sideways', 'random_restart']
+  const data = variants.map((variant) => ({
+    ...base,
+    settings: { ...base.settings, variant, max_sideways: 2, max_restart: 3 },
+    result: {
+      ...base.result,
+      sideways_moves: 1,
+      restarts_completed: 1,
+      iterations_per_restart: [1, 0],
+    },
+  }))
+  const parsed = parseSavedRuns(data)
+  assert.equal(parsed.unavailable, 0)
+  assert.deepEqual(
+    parsed.runs.map((run) => run.settings.variant),
+    variants
+  )
+  assert.deepEqual(parsed.runs[3].result.iterations_per_restart, [1, 0])
+})
+
 test('saved results reject malformed responses instead of reporting an empty history', () => {
   assert.throws(() => parseSavedRuns({ error: 'database unavailable' }))
 })

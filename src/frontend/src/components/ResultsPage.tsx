@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { loadRuns } from '../api/runs'
 import type { SteepestAscentRun } from '../types/run'
+import { hillClimbingLabels, hillClimbingStopLabels } from '../types/run'
 import DownloadRunButton from './DownloadRunButton'
 import ObjectiveChart from './ObjectiveChart'
 import ArrangementGrid from './ArrangementGrid'
@@ -93,7 +94,7 @@ export default function ResultsPage({
       )}
       {unavailable > 0 && (
         <p className="field-hint">
-          {unavailable} older or unsupported records lack complete Steepest Ascent data and are not
+          {unavailable} older or unsupported records lack complete Hill Climbing data and are not
           shown.
         </p>
       )}
@@ -105,7 +106,7 @@ export default function ResultsPage({
       {run && result && (
         <div role="region" aria-label="Saved run results">
           <div className="section-heading result-title">
-            <h3>Steepest Ascent</h3>
+            <h3>{hillClimbingLabels[run.settings.variant]}</h3>
             <span className="saved-label">Saved</span>
           </div>
           <p className="field-hint">
@@ -195,13 +196,38 @@ export default function ResultsPage({
               <dd>{result.neighbors_evaluated.toLocaleString()}</dd>
             </div>
           </dl>
+          {run.settings.variant === 'sideways' && (
+            <p className="field-hint">
+              Sideways moves: {result.sideways_moves ?? 'Unavailable'} · Consecutive limit:{' '}
+              {run.settings.max_sideways ?? 'Unavailable'}.
+            </p>
+          )}
+          {run.settings.variant === 'random_restart' && (
+            <div className="field-hint">
+              <p>
+                Restarts completed: {result.restarts_completed ?? 'Unavailable'} /{' '}
+                {run.settings.max_restart ?? 'Unavailable'}. Final state is the best found across
+                all attempts. Drops in the search trace mark fresh restarts.
+              </p>
+              {result.iterations_per_restart && (
+                <details>
+                  <summary>Iterations per restart</summary>
+                  <ul>
+                    {result.iterations_per_restart.map((count, index) => (
+                      <li key={index}>
+                        {index === 0 ? 'Initial search' : `Restart ${index}`}: {count} scans
+                      </li>
+                    ))}
+                  </ul>
+                </details>
+              )}
+            </div>
+          )}
           <ObjectiveChart history={result.objective_history} />
           <p className="field-hint">
-            {result.stop_reason === 'local_optimum'
-              ? 'Stopped at a local optimum.'
-              : 'Stopped at the iteration limit.'}{' '}
-            Iterations include the terminal no-improvement scan. Search time excludes
-            initialization, database access, and visualization waits.
+            {hillClimbingStopLabels[result.stop_reason]} Iterations include the terminal
+            no-improvement scan. Search time excludes initialization, database access, and
+            visualization waits.
           </p>
           <div className="run-footer">
             <span>
@@ -227,8 +253,8 @@ export default function ResultsPage({
                 <option value="">No comparison</option>
                 {comparable.map((item) => (
                   <option key={item.id} value={item.id}>
-                    {item.id.slice(0, 8)} · Seed {item.random_seed} · Objective{' '}
-                    {item.result.final_objective}
+                    {item.id.slice(0, 8)} · {hillClimbingLabels[item.settings.variant]} · Seed{' '}
+                    {item.random_seed} · Objective {item.result.final_objective}
                   </option>
                 ))}
               </select>
@@ -246,6 +272,7 @@ export default function ResultsPage({
                 <table>
                   <thead>
                     <tr>
+                      <th>Variant</th>
                       <th>Seed</th>
                       <th>Initial</th>
                       <th>Final</th>
@@ -257,6 +284,7 @@ export default function ResultsPage({
                   <tbody>
                     {[run, comparison].map((item) => (
                       <tr key={item.id} aria-current={item.id === run.id ? 'true' : undefined}>
+                        <td>{hillClimbingLabels[item.settings.variant]}</td>
                         <td>{item.random_seed}</td>
                         <td>{item.result.initial_objective}</td>
                         <td>{item.result.final_objective}</td>
