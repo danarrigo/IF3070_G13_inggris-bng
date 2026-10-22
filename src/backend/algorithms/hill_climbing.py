@@ -8,6 +8,7 @@ from algorithms.neighbors import (
     rotate_vehicle,
     swap_vehicles,
 )
+from algorithms.objective import calculate_objective
 from algorithms.validation import validate_arrangement
 from models.config import ConfigModel
 from models.run import VehiclePlacement
@@ -74,7 +75,25 @@ def generate_neighbors(
     return neighbors
 
 
-def hill_climbing(db: Database[dict[str, object]], random_seed: int = 42):
+def hill_climbing(
+    db: Database[dict[str, object]], random_seed: int = 42
+) -> list[VehiclePlacement]:
     prepared_run = prepare_run(db, random_seed=random_seed)
     current: list[VehiclePlacement] = prepared_run.initial_arrangement
     current_obj: int = prepared_run.initial_objective
+    higher_neighbor = True
+    highest_obj = -1
+    highest_neighbor: list[VehiclePlacement] | None = None
+    while higher_neighbor == True:
+        highest_obj = current_obj
+        highest_neighbor = None
+        for neighbor in generate_neighbors(current, prepared_run.config):
+            score = calculate_objective(prepared_run.config, neighbor)
+            if score > highest_obj:
+                highest_obj = score
+                highest_neighbor = neighbor
+        if highest_neighbor is None:
+            break
+        current_obj = highest_obj
+        current = highest_neighbor
+    return current
