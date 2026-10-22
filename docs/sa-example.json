@@ -1,0 +1,9 @@
+{
+  "ship": { "length": 8, "width": 6, "max_weight": 100 },
+  "vehicles": [
+    { "id": "00000000-0000-0000-0000-000000000001", "length": 4, "width": 3, "weight": 40, "shipping_fee": 60, "eta": 1 },
+    { "id": "00000000-0000-0000-0000-000000000002", "length": 3, "width": 2, "weight": 35, "shipping_fee": 90, "eta": 2 },
+    { "id": "00000000-0000-0000-0000-000000000003", "length": 2, "width": 2, "weight": 30, "shipping_fee": 80, "eta": 3 },
+    { "id": "00000000-0000-0000-0000-000000000004", "length": 5, "width": 2, "weight": 50, "shipping_fee": 110, "eta": 4 }
+  ]
+}

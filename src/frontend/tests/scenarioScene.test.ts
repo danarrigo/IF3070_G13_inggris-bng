@@ -3,6 +3,23 @@ import { test } from 'node:test'
 import * as THREE from 'three'
 import type { Config, Vehicle } from '../src/types/config.ts'
 import { buildScenario, disposeScenario, layoutVehicles } from '../src/components/scenarioScene.ts'
+import { arrangementConfig } from '../src/types/run.ts'
+
+test('search placements preserve rotation and unloaded staging without changing input', () => {
+  const source = config([vehicle(), vehicle({ id: 'vehicle-2', x: 3, y: 4 })])
+  source.preserve_positions = false
+  const before = structuredClone(source)
+  const shown = arrangementConfig(source, [{ vehicle_id: 'vehicle-1', x: 1, y: 2, length: 2, width: 4 }])
+  assert.deepEqual(source, before)
+  assert.equal(shown.preserve_positions, true)
+  assert.equal(shown.vehicles[0].length, 2)
+  assert.equal(shown.vehicles[0].width, 4)
+  assert.equal(shown.vehicles[1].x, null)
+  const [loaded, unloaded] = layoutVehicles(shown)
+  assert(loaded.placed && !unloaded.placed)
+  near(loaded.length, 1.8)
+  near(loaded.width, 3.6)
+})
 
 function vehicle(patch: Partial<Vehicle> = {}): Vehicle {
   return {

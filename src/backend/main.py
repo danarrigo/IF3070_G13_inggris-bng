@@ -7,6 +7,7 @@ from pydantic import BaseModel
 from api.config import router as config_router
 from api.optimization import router as optimization_router
 from api.runs import router as runs_router
+from api.search import router as search_router
 from core.database import create_client
 
 
@@ -24,6 +25,7 @@ app = FastAPI(title="DAI API", lifespan=lifespan)
 app.include_router(config_router)
 app.include_router(runs_router)
 app.include_router(optimization_router)
+app.include_router(search_router)
 
 
 class HealthResponse(BaseModel):

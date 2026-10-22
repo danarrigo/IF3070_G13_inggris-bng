@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
-import { executeSteepestAscentLive, RunCancelledError } from '../api/liveOptimization'
+import { executeHillClimbingLive, RunCancelledError } from '../api/liveOptimization'
 import type { Config } from '../types/config'
 import type { IterationComparison, LiveRun, SceneView, SteepestAscentRun } from '../types/run'
 import ObjectiveChart from './ObjectiveChart'
@@ -85,7 +85,7 @@ function SteepestAscentPanel({
     playback.setSpeed(playbackSpeed)
     playbackRef.current = playback
     try {
-      const completed = await executeSteepestAscentLive(
+      const completed = await executeHillClimbingLive(
         config,
         seed,
         iterations,

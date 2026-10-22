@@ -13,6 +13,7 @@ import { loadConfig, saveConfig } from './api/config'
 import { compareIteration } from './iterationHistory'
 import VehicleGenerator from './components/VehicleGenerator'
 import SteepestAscentPanel from './components/SteepestAscentPanel'
+import AnnealingPanel from './components/AnnealingPanel'
 import ResultsPage from './components/ResultsPage'
 import ArrangementGrid from './components/ArrangementGrid'
 import { configForPlacements, configForRunView } from './components/runPresentation'
@@ -83,6 +84,10 @@ function App() {
   const [busy, setBusy] = useState(false)
   const [dirty, setDirty] = useState(false)
   const [running, setRunning] = useState(false)
+  const [algorithm, setAlgorithm] = useState<'hill_climbing' | 'simulated_annealing'>(
+    'hill_climbing'
+  )
+  const [annealingPreview, setAnnealingPreview] = useState<Config | null>(null)
   const [completedRun, setCompletedRun] = useState<SteepestAscentRun | null>(null)
   const [resultRun, setResultRun] = useState<SteepestAscentRun | null>(null)
   const [resultView, setResultView] = useState<'initial' | 'final'>('final')
@@ -269,6 +274,8 @@ function App() {
   const previewConfig = useMemo(() => {
     if (page === 'results')
       return resultRun ? configForRunView(resultRun, resultView) : draftPreview
+    if (page === 'optimization' && algorithm === 'simulated_annealing')
+      return annealingPreview ?? draftPreview
     if (page !== 'optimization' || view === 'configuration') return draftPreview
     if (view === 'live') return livePreview ?? draftPreview
     if (view === 'before' || view === 'after') return comparisonPreview ?? draftPreview
@@ -284,6 +291,8 @@ function App() {
     comparisonPreview,
     resultRun,
     resultView,
+    algorithm,
+    annealingPreview,
   ])
   const displayShip = previewConfig.ship
   const placed = previewConfig.vehicles.filter(
@@ -325,7 +334,11 @@ function App() {
       <Suspense fallback={<div className="ship-background" aria-hidden="true" />}>
         <ShipBackground
           config={previewConfig}
-          candidate={page === 'optimization' && view === 'live' ? candidatePreview : null}
+          candidate={
+            page === 'optimization' && algorithm === 'hill_climbing' && view === 'live'
+              ? candidatePreview
+              : null
+          }
           transitionDuration={550 / playbackSpeed}
           animate={
             page === 'results' ||
@@ -389,7 +402,7 @@ function App() {
           </div>
           <p className="status-message" role="status">
             {running
-              ? 'Steepest Ascent visualization is active.'
+              ? 'Optimization request is active.'
               : busy
                 ? 'Connecting to backend...'
                 : page === 'config'
@@ -412,7 +425,24 @@ function App() {
             </p>
           </div>
           <div hidden={page !== 'optimization'}>
-            <div className="config-navigation">
+            <label className="number-field saved-run-picker algorithm-picker">
+              <span>Algorithm</span>
+              <select
+                value={algorithm}
+                disabled={running}
+                onChange={(event) =>
+                  setAlgorithm(
+                    event.target.value === 'simulated_annealing'
+                      ? 'simulated_annealing'
+                      : 'hill_climbing'
+                  )
+                }
+              >
+                <option value="hill_climbing">Hill Climbing</option>
+                <option value="simulated_annealing">Simulated Annealing</option>
+              </select>
+            </label>
+            <div className="config-navigation" hidden={algorithm !== 'hill_climbing'}>
               <button type="button" className="primary next-button" onClick={openResults}>
                 {running ? 'View saved results' : 'Next: Results'} <span aria-hidden="true">→</span>
               </button>
@@ -425,53 +455,61 @@ function App() {
               {config.ship.width} × {config.ship.length} deck · {config.vehicles.length} vehicles ·{' '}
               {config.preserve_positions ? 'Custom start' : 'Random start'}
             </p>
-            <SteepestAscentPanel
-              config={config}
-              run={completedRun}
-              live={liveRun}
-              view={view}
-              onViewChange={(next) => {
-                setView(next)
-                if (next === 'live') setSelectedIteration(null)
-              }}
-              playbackSpeed={playbackSpeed}
-              onSpeedChange={setPlaybackSpeed}
-              selectedIteration={selectedIteration}
-              comparison={comparison}
-              onComparisonChange={(iteration, side) => {
-                setSelectedIteration(iteration)
-                setView(side)
-              }}
-              validateConfig={validateConfig}
-              onStart={() => {
-                setCompletedRun(null)
-                setLiveRun(null)
-                setSelectedIteration(null)
-                setView('live')
-              }}
-              onProgress={setLiveRun}
-              onRunningChange={(active) => {
-                setRunning(active)
-                if (!active)
-                  setLiveRun((previous) =>
-                    previous
-                      ? {
-                          ...previous,
-                          best_candidate: null,
-                          best_objective: null,
-                          neighbor_preview: null,
-                        }
-                      : null
-                  )
-              }}
-              onComplete={(run) => {
-                setCompletedRun(run)
-                loadDefaultResult(run)
-                setView('final')
-              }}
-            />
+            <div hidden={algorithm !== 'hill_climbing'}>
+              <SteepestAscentPanel
+                config={config}
+                run={completedRun}
+                live={liveRun}
+                view={view}
+                onViewChange={(next) => {
+                  setView(next)
+                  if (next === 'live') setSelectedIteration(null)
+                }}
+                playbackSpeed={playbackSpeed}
+                onSpeedChange={setPlaybackSpeed}
+                selectedIteration={selectedIteration}
+                comparison={comparison}
+                onComparisonChange={(iteration, side) => {
+                  setSelectedIteration(iteration)
+                  setView(side)
+                }}
+                validateConfig={validateConfig}
+                onStart={() => {
+                  setCompletedRun(null)
+                  setLiveRun(null)
+                  setSelectedIteration(null)
+                  setView('live')
+                }}
+                onProgress={setLiveRun}
+                onRunningChange={(active) => {
+                  setRunning(active)
+                  if (!active)
+                    setLiveRun((previous) =>
+                      previous
+                        ? {
+                            ...previous,
+                            best_candidate: null,
+                            best_objective: null,
+                            neighbor_preview: null,
+                          }
+                        : null
+                    )
+                }}
+                onComplete={(run) => {
+                  setCompletedRun(run)
+                  loadDefaultResult(run)
+                  setView('final')
+                }}
+              />
+            </div>
+            <div hidden={algorithm !== 'simulated_annealing'}>
+              <AnnealingPanel
+                config={config}
+                onPreview={setAnnealingPreview}
+                onRunningChange={setRunning}
+              />
+            </div>
           </div>
-
           <div hidden={page !== 'results'}>
             <ResultsPage
               active={page === 'results'}
