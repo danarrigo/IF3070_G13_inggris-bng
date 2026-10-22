@@ -53,14 +53,17 @@ from collections.abc import Callable, Sequence
 from random import Random
 from time import perf_counter
 
-from algorithms.initialization import initialize_arrangement
 from algorithms.genetic_algorithm.demo import DemoRecorder, mutation_change
+from algorithms.initialization import initialize_arrangement
 from algorithms.neighbors import random_neighbor
 from algorithms.objective import calculate_objective
 from algorithms.validation import validate_arrangement
 from models.config import ConfigModel
 from models.run import (
-    GeneticAlgorithmSettings, ObjectivePoint, PopulationPoint, RunResult,
+    GeneticAlgorithmSettings,
+    ObjectivePoint,
+    PopulationPoint,
+    RunResult,
     VehiclePlacement,
 )
 
@@ -80,8 +83,10 @@ def check_cancelled(should_stop: Callable[[], bool] | None) -> None:
 
 
 """salin placement agar perubahan pada child tidak ikut mengubah parentnya"""
+
+
 def copy_individual(individual: Sequence[VehiclePlacement]) -> Individual:
-    
+
     return [placement.model_copy(deep=True) for placement in individual]
 
 
@@ -89,11 +94,16 @@ def copy_individual(individual: Sequence[VehiclePlacement]) -> Individual:
 pilih induk berdasarkan fitness
 induk yang sama boleh terpilih lagi sebagai parent
 """
+
+
 def roulette_selection(
-    population: list[Individual], fitness: list[int], rng: Random,
-    recorder: DemoRecorder | None = None, parent_number: int = 1,
+    population: list[Individual],
+    fitness: list[int],
+    rng: Random,
+    recorder: DemoRecorder | None = None,
+    parent_number: int = 1,
 ) -> Individual:
-    
+
     total_fitness = sum(fitness)
 
     if total_fitness == 0:
@@ -138,9 +148,16 @@ def roulette_selection(
 
 
 """gabung induk satu sama lain, pertahankan anak valid, lalu ulangi anak yang belum valid"""
+
+
 def crossover(
-    config: ConfigModel, first: Individual, second: Individual, rng: Random,
-    *, max_attempts: int = MAX_CROSSOVER_ATTEMPTS, recorder: DemoRecorder | None = None,
+    config: ConfigModel,
+    first: Individual,
+    second: Individual,
+    rng: Random,
+    *,
+    max_attempts: int = MAX_CROSSOVER_ATTEMPTS,
+    recorder: DemoRecorder | None = None,
 ) -> tuple[Individual, Individual]:
 
     if max_attempts <= 0:
@@ -163,7 +180,9 @@ def crossover(
     children: list[Individual | None] = [None, None]
 
     for attempt in range(1, max_attempts + 1):
-        cut = rng.randrange(1, len(config.vehicles)) # menentukan titik potong one point crossover
+        cut = rng.randrange(
+            1, len(config.vehicles)
+        )  # menentukan titik potong one point crossover
         # example: randrange(1, 5) = 2
         # Urutan gen: V1 V2 | V3 V4 V5
         # Indeks:      0  1 |  2  3  4
@@ -188,17 +207,20 @@ def crossover(
                     candidate.append(placement.model_copy(deep=True))
 
             # ngembaliin pesan errornya klo emang ada error, klo g ya ngebalikin list kosong []
-            errors = validate_arrangement(config, candidate) 
-            
+            errors = validate_arrangement(config, candidate)
+
             if recorder is not None:
                 message = f"Percobaan {attempt}, anak {child_index + 1}: "
                 if errors:
                     message += "ditolak; coba titik potong baru."
                 else:
                     message += "valid; dipertahankan."
-                retained_children = [i + 1 for i, child in enumerate(children) if child is not None]
+                retained_children = [
+                    i + 1 for i, child in enumerate(children) if child is not None
+                ]
                 recorder.add(
-                    "validation", message,
+                    "validation",
+                    message,
                     child=child_index + 1,
                     attempt=attempt,
                     cut=cut,
@@ -241,11 +263,17 @@ def crossover(
 coba satu pemanggilan random_neighbor jika undian mutasi terpilih
 fungsi ini akan mutate 1 child saja (bukan kedua anak dari parentnya)
 """
+
+
 def mutate(
-    config: ConfigModel, child: Individual, rate: float, rng: Random,
-    recorder: DemoRecorder | None = None, child_index: int | None = None,
+    config: ConfigModel,
+    child: Individual,
+    rate: float,
+    rng: Random,
+    recorder: DemoRecorder | None = None,
+    child_index: int | None = None,
 ) -> Individual:
-    
+
     draw = rng.random()
     result = child
     operation = "not selected"
@@ -268,7 +296,8 @@ def mutate(
         else:
             message = f"Mutasi diterima: {operation}."
         recorder.add(
-            "mutation", message,
+            "mutation",
+            message,
             child=child_index,
             draw=draw,
             draw_kind="rate",
@@ -285,13 +314,19 @@ def mutate(
 jalankan GA tanpa akses http/database.
 callback menerima salinan data
 """
+
+
 def run_genetic_algorithm(
-    config: ConfigModel, settings: GeneticAlgorithmSettings,
-    initial_arrangement: Sequence[VehiclePlacement], rng: Random,
+    config: ConfigModel,
+    settings: GeneticAlgorithmSettings,
+    initial_arrangement: Sequence[VehiclePlacement],
+    rng: Random,
     on_progress: ProgressCallback | None = None,
-    *, record_demo: bool = False, should_stop: Callable[[], bool] | None = None,
+    *,
+    record_demo: bool = False,
+    should_stop: Callable[[], bool] | None = None,
 ) -> RunResult:
-    
+
     started = perf_counter()
     check_cancelled(should_stop)
 
@@ -303,7 +338,9 @@ def run_genetic_algorithm(
             or len(config.vehicles) > 30
         )
         if demo_too_large:
-            raise ValueError("Demo recording supports at most 10 individuals, 10 generations, and 30 vehicles.")
+            raise ValueError(
+                "Demo recording supports at most 10 individuals, 10 generations, and 30 vehicles."
+            )
 
     recorder = DemoRecorder(record_demo)
     errors = validate_arrangement(config, initial_arrangement)
@@ -404,7 +441,8 @@ def run_genetic_algorithm(
             else:
                 message = "Crossover dilewati; kedua anak menyalin induknya."
             recorder.add(
-                "crossover", message,
+                "crossover",
+                message,
                 parents=[first, second],
                 parent_ids=parent_ids,
                 draw=draw,
@@ -419,7 +457,9 @@ def run_genetic_algorithm(
 
             offspring = []
             for i, child in enumerate(children):
-                mutated_child = mutate(config, child, settings.mutation_rate, rng, recorder, i + 1)
+                mutated_child = mutate(
+                    config, child, settings.mutation_rate, rng, recorder, i + 1
+                )
                 offspring.append(mutated_child)
 
             remaining_slots = settings.population_size - len(next_population)
@@ -447,9 +487,12 @@ def run_genetic_algorithm(
             if len(admitted) == 1:
                 message += " Satu anak lain tidak dimasukkan karena slot tinggal satu."
             recorder.add(
-                "admission", message,
+                "admission",
+                message,
                 retained_children=admitted,
-                individuals=recorder.population(next_population, demo_fitness, generation + 1),
+                individuals=recorder.population(
+                    next_population, demo_fitness, generation + 1
+                ),
             )
 
         recorder.pair = None
@@ -460,7 +503,9 @@ def run_genetic_algorithm(
         recorder.add(
             "generation",
             f"Generasi {generation + 1} lengkap: satu elite dan anak-anak yang diterima.",
-            individuals=recorder.population(next_population, demo_fitness, generation + 1),
+            individuals=recorder.population(
+                next_population, demo_fitness, generation + 1
+            ),
         )
 
         # populasi baru menjadi populasi yang dievaluasi pada iterasi berikutnya
@@ -469,7 +514,9 @@ def run_genetic_algorithm(
     # susun hasil akhir beserta daftar kendaraan di luar dan riwayat fitness
     check_cancelled(should_stop)
     loaded = {placement.vehicle_id for placement in best}
-    unloaded_vehicle_ids = [vehicle.id for vehicle in config.vehicles if vehicle.id not in loaded]
+    unloaded_vehicle_ids = [
+        vehicle.id for vehicle in config.vehicles if vehicle.id not in loaded
+    ]
     objective_history = [
         ObjectivePoint(iteration=point.generation, objective=point.maximum)
         for point in history

@@ -2,9 +2,9 @@ from unittest.mock import MagicMock
 
 from models.config import ConfigModel, Ship, Vehicle
 from repository.config_repository import (
+    find_config,
     insert_config,
     remove_config,
-    find_config,
     replace_config,
 )
 
@@ -12,9 +12,7 @@ from repository.config_repository import (
 def make_config() -> ConfigModel:
     return ConfigModel(
         ship=Ship(length=10, width=10, max_weight=1000),
-        vehicles=[
-            Vehicle(length=2, width=1, weight=100, eta=0, shipping_fee=50)
-        ],
+        vehicles=[Vehicle(length=2, width=1, weight=100, eta=0, shipping_fee=50)],
     )
 
 

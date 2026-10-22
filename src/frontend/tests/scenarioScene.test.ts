@@ -3,9 +3,36 @@ import { test } from 'node:test'
 import * as THREE from 'three'
 import type { Config, Vehicle } from '../src/types/config.ts'
 import { buildScenario, disposeScenario, layoutVehicles } from '../src/components/scenarioScene.ts'
+import { arrangementConfig } from '../src/types/run.ts'
+
+test('search placements preserve rotation and unloaded staging without changing input', () => {
+  const source = config([vehicle(), vehicle({ id: 'vehicle-2', x: 3, y: 4 })])
+  source.preserve_positions = false
+  const before = structuredClone(source)
+  const shown = arrangementConfig(source, [{ vehicle_id: 'vehicle-1', x: 1, y: 2, length: 2, width: 4 }])
+  assert.deepEqual(source, before)
+  assert.equal(shown.preserve_positions, true)
+  assert.equal(shown.vehicles[0].length, 2)
+  assert.equal(shown.vehicles[0].width, 4)
+  assert.equal(shown.vehicles[1].x, null)
+  const [loaded, unloaded] = layoutVehicles(shown)
+  assert(loaded.placed && !unloaded.placed)
+  near(loaded.length, 1.8)
+  near(loaded.width, 3.6)
+})
 
 function vehicle(patch: Partial<Vehicle> = {}): Vehicle {
-  return { id: 'vehicle-1', x: null, y: null, length: 4, width: 2, weight: 1000, eta: 0, shipping_fee: 500, ...patch }
+  return {
+    id: 'vehicle-1',
+    x: null,
+    y: null,
+    length: 4,
+    width: 2,
+    weight: 1000,
+    eta: 0,
+    shipping_fee: 500,
+    ...patch,
+  }
 }
 
 function config(vehicles: Vehicle[]): Config {
@@ -17,9 +44,9 @@ function near(actual: number, expected: number) {
 }
 
 test('maps grid X across the deck and Y along its length without shifting the origin', () => {
-  const [first, last] = layoutVehicles(config([
-    vehicle({ x: 0, y: 0 }), vehicle({ id: 'vehicle-2', x: 8, y: 16 }),
-  ]))
+  const [first, last] = layoutVehicles(
+    config([vehicle({ x: 0, y: 0 }), vehicle({ id: 'vehicle-2', x: 8, y: 16 })])
+  )
   assert(first.placed && last.placed)
   near(first.x, -7.2)
   near(first.z, -3.6)
@@ -38,7 +65,11 @@ test('uses the same uniform scale for ship and vehicle dimensions', () => {
 })
 
 test('stages every unplaced or partially positioned vehicle beside the ship without overlap', () => {
-  const input = config(Array.from({ length: 20 }, (_, index) => vehicle({ id: String(index), x: index === 0 ? 0 : null })))
+  const input = config(
+    Array.from({ length: 20 }, (_, index) =>
+      vehicle({ id: String(index), x: index === 0 ? 0 : null })
+    )
+  )
   const original = JSON.stringify(input)
   const layouts = layoutVehicles(input)
   assert.equal(layouts.length, 20)
@@ -46,8 +77,9 @@ test('stages every unplaced or partially positioned vehicle beside the ship with
     assert.equal(item.placed, false)
     assert(item.z - item.width / 2 > 4.5)
     for (const other of layouts.slice(index + 1)) {
-      const overlap = Math.abs(item.x - other.x) < (item.length + other.length) / 2
-        && Math.abs(item.z - other.z) < (item.width + other.width) / 2
+      const overlap =
+        Math.abs(item.x - other.x) < (item.length + other.length) / 2 &&
+        Math.abs(item.z - other.z) < (item.width + other.width) / 2
       assert.equal(overlap, false)
     }
   }
@@ -75,7 +107,11 @@ test('builds finite geometry for empty and populated configs and disposes it', (
     const scene = buildScenario(input)
     const bounds = new THREE.Box3().setFromObject(scene)
     assert(!bounds.isEmpty())
-    assert([bounds.min.x, bounds.min.y, bounds.min.z, bounds.max.x, bounds.max.y, bounds.max.z].every(Number.isFinite))
+    assert(
+      [bounds.min.x, bounds.min.y, bounds.min.z, bounds.max.x, bounds.max.y, bounds.max.z].every(
+        Number.isFinite
+      )
+    )
     disposeScenario(scene)
   }
 })

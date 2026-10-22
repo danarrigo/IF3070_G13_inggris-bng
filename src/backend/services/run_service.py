@@ -1,10 +1,12 @@
 import hashlib
 import json
+from collections.abc import Callable
 from dataclasses import dataclass
 from random import Random
 
 from pymongo.database import Database
 
+from algorithms.cancellation import check_cancellation
 from algorithms.initialization import initialize_arrangement
 from algorithms.objective import calculate_objective
 from dtos.run import CreateRunRequest
@@ -43,10 +45,26 @@ def prepare_run(
     experiments use the config's start-mode toggle (random by default). An explicit
     preserve_positions argument overrides that saved setting.
     """
-    config = load_config(db)
+    return prepare_config(
+        load_config(db), random_seed=random_seed, preserve_positions=preserve_positions
+    )
+
+
+def prepare_config(
+    config: ConfigModel,
+    *,
+    random_seed: int,
+    preserve_positions: bool | None = None,
+    should_cancel: Callable[[], bool] | None = None,
+) -> PreparedRun:
+    check_cancellation(should_cancel)
+    config = config.model_copy(deep=True)
     rng = Random(random_seed)
     placements = initialize_arrangement(
-        config, rng, preserve_positions=preserve_positions
+        config,
+        rng,
+        preserve_positions=preserve_positions,
+        should_cancel=should_cancel,
     )
     return PreparedRun(
         config=config,

@@ -27,7 +27,9 @@ class JobManager:
         self._active_id: UUID | None = None
         self._cancel_events: dict[UUID, Event] = {}
 
-    def start(self, request: StartJobRequest, db: Database) -> JobState:
+    def start(
+        self, request: StartJobRequest, db: Database[dict[str, object]]
+    ) -> JobState:
         # Reserve the only worker slot atomically, before starting any work.
         with self._lock:
             if self._active_id is not None:
@@ -58,7 +60,9 @@ class JobManager:
             snapshot = job.model_copy(update={"run": None}, deep=True)
             if job.run is not None:
                 light_result = job.run.result.model_copy(update={"demo_trace": None})
-                snapshot.run = job.run.model_copy(update={"result": light_result}).model_copy(deep=True)
+                snapshot.run = job.run.model_copy(
+                    update={"result": light_result}
+                ).model_copy(deep=True)
             if job.status in {"queued", "running"}:
                 snapshot.elapsed_ms = (perf_counter() - self._started[job_id]) * 1000
             return snapshot
@@ -74,13 +78,17 @@ class JobManager:
             if job is None:
                 raise KeyError(job_id)
             if job.stage == "saving":
-                raise ValueError("The search has finished and its result is being saved. Wait for completion.")
+                raise ValueError(
+                    "The search has finished and its result is being saved. Wait for completion."
+                )
             if job.status in {"queued", "running"}:
                 self._cancel_events[job_id].set()
                 job.stage = "cancelling"
-        return self.get(job_id)
+        snapshot = self.get(job_id)
+        assert snapshot is not None
+        return snapshot
 
-    def _execute(self, job_id: UUID, db: Database) -> None:
+    def _execute(self, job_id: UUID, db: Database[dict[str, object]]) -> None:
         with self._lock:
             job = self._jobs[job_id]
             request = job.request.model_copy(deep=True)
@@ -102,11 +110,21 @@ class JobManager:
                 raise SearchCancelled()
             rng = Random(request.random_seed)
             initial = initialize_arrangement(request.config, rng)
-            result = run_genetic_algorithm(request.config, request.settings, initial, rng, progress,
-                                          record_demo=request.record_demo, should_stop=stop.is_set)
+            result = run_genetic_algorithm(
+                request.config,
+                request.settings,
+                initial,
+                rng,
+                progress,
+                record_demo=request.record_demo,
+                should_stop=stop.is_set,
+            )
             run = RunModel(
-                random_seed=request.random_seed, configHash=hash_config(request.config),
-                config=request.config, settings=request.settings, result=result,
+                random_seed=request.random_seed,
+                configHash=hash_config(request.config),
+                config=request.config,
+                settings=request.settings,
+                result=result,
             )
             with self._lock:
                 # Cancellation and entry into saving share the same lock.
