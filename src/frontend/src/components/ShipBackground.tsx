@@ -63,7 +63,7 @@ function ShipBackground({ config }: { config: Config }) {
     function invalidate() { needsRender = true }
     controls.addEventListener('change', invalidate)
 
-    function fitScene() {
+    function fitScene(preserveCamera = false) {
       const bounds = new THREE.Box3().setFromObject(scenario)
       if (bounds.isEmpty()) return
       const sphere = bounds.getBoundingSphere(new THREE.Sphere())
@@ -72,8 +72,10 @@ function ShipBackground({ config }: { config: Config }) {
       const direction = camera.position.clone().sub(controls.target).normalize()
       const distance = radius / Math.sin(THREE.MathUtils.degToRad(camera.fov / 2))
         * 1.05 / Math.min(1, camera.aspect)
-      controls.target.copy(center)
-      camera.position.copy(center).addScaledVector(direction, distance)
+      if (!preserveCamera) {
+        controls.target.copy(center)
+        camera.position.copy(center).addScaledVector(direction, distance)
+      }
       camera.far = Math.max(150, distance * 5)
       camera.updateProjectionMatrix()
       controls.update()
@@ -103,13 +105,16 @@ function ShipBackground({ config }: { config: Config }) {
       fitScene()
       needsRender = true
     }
+    let scenarioKey = ''
     updateRef.current = (next) => {
+      const nextKey = JSON.stringify([next.ship.length, next.ship.width, next.vehicles.map(v => [v.id, Math.max(v.length, v.width)])])
       const updated = buildScenario(next)
       scene.remove(scenario)
       disposeScenario(scenario)
       scenario = updated
       scene.add(scenario)
-      fitScene()
+      fitScene(scenarioKey === nextKey)
+      scenarioKey = nextKey
       needsRender = true
     }
     resize()

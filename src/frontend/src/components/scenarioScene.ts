@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import type { Config, Vehicle } from '../types/config.ts'
+import { vehicleColor } from './runView.ts'
 
 export interface VehicleLayout {
   vehicle: Vehicle
@@ -130,18 +131,18 @@ export function buildScenario(config: Config): THREE.Group {
   group.add(new THREE.LineSegments(gridGeometry, new THREE.LineBasicMaterial({ color: 0xc5cfbe, transparent: true, opacity: .5 })))
 
   const wheelTransforms: THREE.Matrix4[] = []
-  const palette = new Map<number, THREE.Material>()
+  const palette = new Map<string, THREE.Material>()
   const layouts = layoutVehicles(config)
   for (const layout of layouts) {
-    const { length: l, width: w, x, z, index } = layout
+    const { length: l, width: w, x, z } = layout
     const baseY = layout.placed ? deckY + .02 : .02
     const radius = Math.min(l * .1, w * .18)
     const height = Math.min(l * .25, w * .65)
-    const hue = (index * 67 + 165) % 360
-    let paint = palette.get(hue)
+    const color = vehicleColor(layout.vehicle.id)
+    let paint = palette.get(color)
     if (!paint) {
-      paint = new THREE.MeshStandardMaterial({ color: new THREE.Color(`hsl(${hue}, 45%, 35%)`), roughness: .4, metalness: .2 })
-      palette.set(hue, paint)
+      paint = new THREE.MeshStandardMaterial({ color: new THREE.Color(color), roughness: .4, metalness: .2 })
+      palette.set(color, paint)
     }
     box(l * .96, height * .43, w * .84, x, baseY + radius + height * .16, z, paint)
     box(l * .48, height * .42, w * .7, x - l * .04, baseY + radius + height * .56, z, paint)
