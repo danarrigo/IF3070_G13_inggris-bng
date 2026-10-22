@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "FastAPI backend for the DAI project"
 requires-python = ">=3.12"
 dependencies = [
+    "anyio>=4,<5",
     "fastapi[standard]>=0.115,<1",
     "pydantic-settings>=2.16.0",
     "pymongo>=4.19.0",
@@ -11,9 +12,22 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "basedpyright>=1.40.2",
     "httpx>=0.28,<1",
+    "httpx2>=2.16.0",
     "pytest>=8,<10",
+    "ruff>=0.17.1",
 ]
+
+[tool.basedpyright]
+typeCheckingMode = "standard"
+strict = ["algorithms", "api", "core", "dtos", "models", "repository", "services", "main.py"]
+
+[tool.ruff]
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I", "UP", "B", "SIM"]
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
