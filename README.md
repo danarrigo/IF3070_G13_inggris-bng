@@ -1,8 +1,28 @@
-# Repository Tugas Besar 1 DAI
+# Optimasi Pemuatan Kendaraan ke Kapal
 
-- 18224031
-- 18224093
-- 18224107
+Tugas Besar 1 IF3070 Dasar Inteligensi Artifisial 2026/2027, **Kelompok 13 - inggris-bng**.
+
+Aplikasi ini mencari susunan kendaraan pada geladak kapal untuk memaksimalkan total shipping fee tanpa overlap, keluar batas geladak, atau melebihi kapasitas berat. Implementasi pencarian menggunakan Python: Steepest Ascent, Stochastic, Sideways, Random Restart Hill Climbing, Simulated Annealing, dan Genetic Algorithm. Antarmuka web menyediakan konfigurasi, visualisasi 2D/3D, grafik hasil, penyimpanan MongoDB, serta ekspor berkas eksperimen. Bonus objective ETA tersedia terpisah dari objective wajib shipping fee.
+
+## Anggota dan pembagian tugas
+
+| NIM | Pembagian tugas |
+| --- | --- |
+| 18224031 | Implementasi Hill Climbing |
+| 18224093 | Implementasi Simulated Annealing |
+| 18224107 | Implementasi Genetic Algorithm |
+
+## Struktur repository
+
+```text
+src/backend/    Algoritma Python, FastAPI, penyimpanan, dan pengujian
+src/frontend/   Antarmuka React/TypeScript dan visualisasi Three.js
+input/          Config, 33 request eksperimen, state awal, dan indeks input-output
+output/         Hasil run, ringkasan metrik, grafik SVG, dan experiments.csv
+docs/           Lokasi laporan PDF dan lampiran tugas
+```
+
+Laporan PDF belum tersedia di `docs/`. Berkas eksperimen tidak menggantikan analisis, laporan, referensi, atau Form Penggunaan Generative AI.
 
 ## Stack
 
@@ -34,6 +54,8 @@ To remove the database data as well, use `docker compose down -v`. Credentials a
 
 ```bash
 cd src/backend
+# Preserve an existing environment file; copy defaults on first setup only.
+[ -f .env ] || cp .env.example .env
 uv sync
 uv run fastapi dev main.py
 ```
@@ -48,11 +70,13 @@ npm ci
 npm run dev
 ```
 
-Open the URL printed by Vite (usually http://localhost:5173). The scenario editor supports ship settings, a vehicle count with configurable random ranges (length, width, weight, shipping fee, and ETA), individual vehicle edits, an initial-arrangement grid preview, and saving/loading the main config. Generate creates unplaced vehicles; regenerating asks before replacing existing edits. Saving preserves the generated vehicles, not the generation controls. Start MongoDB and the backend to use save/load; editing and previewing work locally. The **Use custom starting positions** toggle is saved with the config as `preserve_positions`. Off (default) randomizes all positions and disables X/Y editing; on preserves filled X/Y pairs and randomizes vehicles without positions. Turning it off retains custom coordinates for later, but ignores them in the preview and initializer. The config page contains configuration only. Use **Next: Optimization** to open the separate Steepest Ascent page; **Back to config** preserves the current draft and generation controls.
+Open the URL printed by Vite (usually http://localhost:5173). The scenario editor supports ship settings, a vehicle count with configurable random ranges (length, width, weight, shipping fee, and ETA), individual vehicle edits, an initial-arrangement grid preview, and saving/loading the main config. Generate creates unplaced vehicles; regenerating asks before replacing existing edits. Saving preserves the generated vehicles, not the generation controls. Start MongoDB and the backend to use save/load; editing and previewing work locally. The **Use custom starting positions** toggle is saved with the config as `preserve_positions`. Off (default) randomizes all positions and disables X/Y editing; on preserves filled X/Y pairs and randomizes vehicles without positions. Turning it off retains custom coordinates for later, but ignores them in the preview and initializer. The config page contains configuration only. Use **Next: Optimization** to open the separate optimization page and choose HC, SA, or GA; **Back to config** preserves the current draft and generation controls.
 
 Vite proxies HTTP and WebSocket `/api` requests to `http://127.0.0.1:8000`, so no development CORS configuration is needed.
 
 ## Saving and exporting results
+
+To replay an experiment in the web UI, click **Import experiment JSON** and choose a file from `input/requests/`. It restores the config, algorithm/variant, seed, parameters, and output/demo options without starting a run or overwriting the saved MongoDB config. Review the fields and click Run. Importing `input/config.json` restores only the configuration. Imports are disabled during an active run, and replacing an edited draft requires confirmation.
 
 Completed web runs for HC, SA, and GA automatically save to MongoDB. SA's single-run and three-experiment actions report completion only after storage succeeds; database failures are shown as errors. The standalone SA experiment CLI remains available without MongoDB.
 
@@ -66,7 +90,7 @@ For any algorithm, enable **Save results to output/** before running. Completed 
 - `run.json`: full config, initial/final states, histories, and replay data when recorded.
 - `initial.svg`, `final.svg`: deck arrangement and unloaded vehicles.
 - `objective.svg`: objective history; GA includes population maximum and average.
-- SA additionally writes `exponential.svg`. If the raw exponential overflows, the graph explicitly uses its natural logarithm; original values remain in JSON.
+- SA additionally writes `exponential.svg`. If the raw exponential overflows, the graph explicitly uses its natural logarithm. JSON retains finite raw exponentials and `log_acceptance`; overflowed raw exponentials are `null`.
 
 Files are generated by the backend in this repository, not in the browser Downloads folder. MongoDB auto-save remains enabled independently of the checkbox. Failed/cancelled searches do not generate report bundles; completed bundles are published only after all their files have been written. SA's `stuck_count` counts stagnation-window episodes, not proven local optima.
 
@@ -80,7 +104,7 @@ score = sum(maximum ETA in the config + 1 - vehicle ETA) for loaded vehicles
 
 Smaller ETA earns more points; all contributions are positive, so an empty ship does not win simply by loading nothing. This maximizes total loaded urgency, not the average/minimum ETA. HC (all variants), SA, GA, replay, saved snapshots, and charts use the selected mode. ETA scores are labeled **ETA priority points**, never monetary revenue. **Shipping fee (required)** remains the default for mandatory experiments. Different objective modes produce different config hashes and are not mixed in same-config comparisons; existing fee-mode hashes remain compatible.
 
-## Running Steepest Ascent
+## Running Hill Climbing
 
 1. Configure or load a scenario and add vehicles on `/#config`.
 2. Click **Next: Optimization**. Invalid or incomplete config fields must be corrected before continuing.
@@ -125,9 +149,35 @@ The shared Python foundation supports rectangle validation, shipping-fee scoring
 - Outside vehicles have no stored coordinates in the placement-list representation. Two unloaded vehicles swapping is therefore unchanged and skipped. An unloaded vehicle's orientation is chosen when entering the deck.
 - `prepare_run()` prepares a saved-config starting state; `prepare_config()` prepares an immutable request snapshot. The execution service passes that snapshot to the pure `steepest_ascent()` search and persists the result.
 
-All four HC variants are available through the API and FE. Results label the actual variant, include sideways/restart metrics when applicable, and compare variants only across identical config snapshots. SA and GA have their own panels in the Algorithm selector, including their experiment plots. Remaining assignment work includes completing and reviewing the required experiments, comparison analysis, report, and release.
+All four HC variants are available through the API and FE. Results label the actual variant, include sideways/restart metrics when applicable, and compare variants only across identical config snapshots. SA and GA have their own panels in the Algorithm selector, including their experiment plots.
 
-Experiments require 3 Hill Climbing runs, 3 SA runs, and 18 GA runs (9 varying iterations at fixed population size plus 9 varying population size at fixed iterations). Submit the report and saved outputs, include the completed Generative AI Usage Form in the report, and publish a tagged GitHub release as required by the assignment.
+### Eksperimen yang sudah dijalankan
+
+Sebanyak **33 run** tersimpan di `output/`, dengan input masing-masing di `input/requests/` dan pemetaan run ID di `input/experiments.json`. Rekap lintas run tersedia di `output/experiments.csv`.
+
+Semua memakai kapal berukuran 10 x 20, kapasitas berat 10.000, daftar 10 kendaraan yang sama, objective **shipping fee**, dan custom starting positions nonaktif. Seed 42, 43, dan 44 digunakan pada setiap varian/konfigurasi. Untuk seed yang sama, state awal keempat varian HC dan SA telah diperiksa identik; state antar-seed berbeda. GA menggunakan populasi susunan acak dan melaporkan individu terbaik dari populasi awal sebagai initial arrangement.
+
+| Algoritma/kelompok | Parameter | Run |
+| --- | --- | ---: |
+| Steepest Ascent HC | Maksimum 100 iterasi | 3 |
+| Stochastic HC | Maksimum 100 iterasi | 3 |
+| Sideways HC | Maksimum 100 iterasi; batas sideways berturut-turut 10 | 3 |
+| Random Restart HC | Total maksimum 100 iterasi; maksimum 3 restart | 3 |
+| SA | Maksimum 1.000 iterasi; suhu awal 1.000; cooling rate 0,99; suhu minimum 0,001; stagnation window 100 | 3 |
+| GA: populasi tetap | Populasi 30; iterasi 50, 100, 200; masing-masing 3 run | 9 |
+| GA: iterasi tetap | Iterasi 100; populasi 10, 20, 40; masing-masing 3 run | 9 |
+| **Total** | | **33** |
+
+GA menggunakan crossover rate 0,8 dan mutation rate 0,3; demo recording nonaktif. Parameter lengkap tersimpan pada request dan summary setiap run. Buka SVG lewat browser untuk melihat gambar dan grafik.
+
+### Catatan interpretasi dan pengumpulan
+
+- Sideways membatasi gerakan sama-skor **berturut-turut**; perbaikan skor mereset hitungan. Cocokkan interpretasi ini dengan salindia/asisten karena spesifikasi tidak menjelaskan reset.
+- SA `stuck_count` menghitung episode tanpa best objective baru selama stagnation window, bukan pembuktian local optimum. Jelaskan definisinya dalam analisis.
+- Config, seed, dan parameter disimpan agar eksperimen dapat dijalankan ulang. Mengimpor file tidak mengunci field: perubahan manual dapat mengubah hasil. Pengulangan seluruh 33 run untuk memverifikasi determinisme belum dilakukan; durasi, timestamp, dan run ID memang dapat berbeda.
+- Bandingkan skor akhir, durasi, konsistensi tiga pengulangan, serta pengaruh populasi/iterasi GA. Jangan menyimpulkan global optimum tanpa dasar pembanding atau pembuktian.
+- Laporan PDF di `docs/` harus mencakup cover, deskripsi persoalan, implementasi algoritma, hasil dan analisis beserta visualisasi, kesimpulan/saran, pembagian tugas, referensi, serta Form Penggunaan Generative AI yang diisi jujur.
+- Sebelum pengumpulan, lengkapi pembagian tugas README, commit/push sumber beserta `input/` dan `output/`, pastikan repository public, dan buat release dengan tag **`vX.Y`** sesuai milestone/revisi.
 
 ## Checks
 

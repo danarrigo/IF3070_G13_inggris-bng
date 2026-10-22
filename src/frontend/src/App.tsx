@@ -12,6 +12,8 @@ import type { FormEvent } from 'react'
 import { loadConfig, saveConfig } from './api/config'
 import { compareIteration } from './iterationHistory'
 import { objectiveLabel } from './objective'
+import { parseExperimentImport } from './experimentImport'
+import type { HCImport, SAImport, GAImport } from './experimentImport'
 import VehicleGenerator from './components/VehicleGenerator'
 import SteepestAscentPanel from './components/SteepestAscentPanel'
 import AnnealingPanel from './components/AnnealingPanel'
@@ -82,6 +84,12 @@ function NumberField({
 function App() {
   const page = useSyncExternalStore(subscribeToPage, currentPage, () => 'config')
   const [config, setConfig] = useState<Config>(initialConfig)
+  const [hcImport, setHCImport] = useState<(HCImport & { key: number }) | null>(null)
+  const [saImport, setSAImport] = useState<(SAImport & { key: number }) | null>(null)
+  const [gaImport, setGAImport] = useState<(GAImport & { key: number }) | null>(null)
+  const [importNotice, setImportNotice] = useState('')
+  const importSequence = useRef(0)
+  const importInput = useRef<HTMLInputElement>(null)
   const [message, setMessage] = useState('Start with a ship, then add your vehicles.')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
@@ -147,6 +155,39 @@ function App() {
         },
       ],
     })
+  }
+
+  async function importExperiment(file: File) {
+    if (busy || running) return
+    setBusy(true)
+    setError('')
+    try {
+      if (file.size > 5 * 1024 * 1024)
+        throw new Error('Choose an input JSON file smaller than 5 MB.')
+      const imported = parseExperimentImport(JSON.parse(await file.text()))
+      if (dirty && !window.confirm('Replace the current draft with this experiment input?')) return
+      edit(imported.config)
+      setCompletedRun(null)
+      setLiveRun(null)
+      setSelectedIteration(null)
+      setAnnealingPreview(null)
+      setGeneticPreview(null)
+      if (imported.kind !== 'config') {
+        const preset = { ...imported, key: ++importSequence.current }
+        if (preset.kind === 'hill_climbing') setHCImport(preset)
+        else if (preset.kind === 'simulated_annealing') setSAImport(preset)
+        else setGAImport(preset)
+        setAlgorithm(imported.kind)
+        navigate('optimization')
+      } else navigate('config')
+      setImportNotice(
+        `Imported ${file.name}. ${imported.kind === 'config' ? 'Configuration only; algorithm settings are unchanged.' : 'Config, seed, and parameters loaded. Review them, then click Run.'} The saved MongoDB config has not been overwritten.`
+      )
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Could not import experiment JSON.')
+    } finally {
+      setBusy(false)
+    }
   }
 
   async function load() {
@@ -384,6 +425,26 @@ function App() {
               )}
             </div>
             <div className="actions">
+              <button
+                type="button"
+                disabled={busy || running}
+                onClick={() => importInput.current?.click()}
+              >
+                Import experiment JSON
+              </button>
+              <input
+                ref={importInput}
+                type="file"
+                accept=".json,application/json"
+                aria-label="Experiment JSON file"
+                hidden
+                disabled={busy || running}
+                onChange={(event) => {
+                  const file = event.currentTarget.files?.[0]
+                  event.currentTarget.value = ''
+                  if (file) void importExperiment(file)
+                }}
+              />
               {page === 'config' ? (
                 <>
                   <button
@@ -422,6 +483,11 @@ function App() {
                     ? 'Inspect saved run snapshots and compare experiments.'
                     : 'Set the seed and iteration limit, then run the current scenario.'}
           </p>
+          {importNotice && (
+            <p className="field-hint" role="status">
+              {importNotice}
+            </p>
+          )}
           {error && (
             <p className="error" role="alert">
               {error}
@@ -472,6 +538,8 @@ function App() {
             </p>
             <div hidden={algorithm !== 'hill_climbing'}>
               <SteepestAscentPanel
+                key={hcImport?.key ?? 0}
+                preset={hcImport ?? undefined}
                 config={config}
                 run={completedRun}
                 live={liveRun}
@@ -519,6 +587,8 @@ function App() {
             </div>
             <div hidden={algorithm !== 'simulated_annealing'}>
               <AnnealingPanel
+                key={saImport?.key ?? 0}
+                preset={saImport ?? undefined}
                 config={config}
                 onPreview={setAnnealingPreview}
                 onRunningChange={setRunning}
@@ -526,6 +596,8 @@ function App() {
             </div>
             <div hidden={algorithm !== 'genetic_algorithm'}>
               <GeneticAlgorithmPanel
+                key={gaImport?.key ?? 0}
+                preset={gaImport ?? undefined}
                 config={config}
                 onPreview={setGeneticPreview}
                 onRunningChange={handleGARunning}

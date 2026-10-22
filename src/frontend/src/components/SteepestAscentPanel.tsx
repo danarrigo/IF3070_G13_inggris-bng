@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
+import type { HCImport } from '../experimentImport'
 import { executeHillClimbingLive, RunCancelledError } from '../api/liveOptimization'
 import type { Config } from '../types/config'
 import { objectiveUnit } from '../objective'
@@ -34,7 +35,9 @@ function SteepestAscentPanel({
   onStart,
   onRunningChange,
   validateConfig,
+  preset,
 }: {
+  preset?: HCImport
   config: Config
   run: SteepestAscentRun | null
   live: LiveRun | null
@@ -51,14 +54,18 @@ function SteepestAscentPanel({
   onRunningChange: (running: boolean) => void
   validateConfig: () => boolean
 }) {
-  const [seed, setSeed] = useState<number | null>(42)
-  const [iterations, setIterations] = useState<number | null>(100)
-  const [variant, setVariant] = useState<HillClimbingVariant>('steepest_ascent')
-  const [maxSideways, setMaxSideways] = useState<number | null>(100)
-  const [maxRestart, setMaxRestart] = useState<number | null>(10)
+  const [seed, setSeed] = useState<number | null>(preset?.seed ?? 42)
+  const [iterations, setIterations] = useState<number | null>(preset?.settings.iterations ?? 100)
+  const [variant, setVariant] = useState<HillClimbingVariant>(
+    preset?.settings.variant ?? 'steepest_ascent'
+  )
+  const [maxSideways, setMaxSideways] = useState<number | null>(
+    preset?.settings.max_sideways ?? 100
+  )
+  const [maxRestart, setMaxRestart] = useState<number | null>(preset?.settings.max_restart ?? 10)
   const [running, setRunning] = useState(false)
-  const [showNeighbors, setShowNeighbors] = useState(false)
-  const [saveToOutput, setSaveToOutput] = useState(false)
+  const [showNeighbors, setShowNeighbors] = useState(preset?.showNeighbors ?? false)
+  const [saveToOutput, setSaveToOutput] = useState(preset?.saveToOutput ?? false)
   const [outputRunId, setOutputRunId] = useState<string | null>(null)
   const [cancelling, setCancelling] = useState(false)
   const [cancelled, setCancelled] = useState(false)

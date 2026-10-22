@@ -11,6 +11,7 @@ import {
 } from '../api/genetic'
 import GeneticAlgorithmReplay from './GeneticAlgorithmReplay'
 import './GeneticAlgorithm.css'
+import type { GAImport } from '../experimentImport'
 import type { Config } from '../types/config'
 import type { GASettings, Job, PopulationPoint, Run } from '../types/run'
 import { arrangementConfig, vehicleColor } from './runView'
@@ -80,19 +81,23 @@ export default function GeneticAlgorithmPanel({
   config,
   onPreview,
   onRunningChange,
+  preset,
 }: {
+  preset?: GAImport
   config: Config
   onPreview: (config: Config | null) => void
   onRunningChange: (running: boolean) => void
 }) {
-  const [settings, setSettings] = useState<GASettings>({
-    algorithm: 'genetic_algorithm',
-    iterations: 100,
-    population_size: 30,
-    crossover_rate: 0.8,
-    mutation_rate: 0.1,
-  })
-  const [seed, setSeed] = useState(42)
+  const [settings, setSettings] = useState<GASettings>(
+    preset?.settings ?? {
+      algorithm: 'genetic_algorithm',
+      iterations: 100,
+      population_size: 30,
+      crossover_rate: 0.8,
+      mutation_rate: 0.1,
+    }
+  )
+  const [seed, setSeed] = useState(preset?.seed ?? 42)
   const [job, setJob] = useState<Job | null>(null)
   const [jobId, setJobId] = useState<string | null>(null)
   const [run, setRun] = useState<Run | null>(null)
@@ -104,8 +109,8 @@ export default function GeneticAlgorithmPanel({
   const [state, setState] = useState<'initial' | 'final'>('initial')
   const [view, setView] = useState<'3d' | '2d'>('3d')
   const [showResult, setShowResult] = useState(true)
-  const [recordDemo, setRecordDemo] = useState(false)
-  const [saveToOutput, setSaveToOutput] = useState(false)
+  const [recordDemo, setRecordDemo] = useState(preset?.recordDemo ?? false)
+  const [saveToOutput, setSaveToOutput] = useState(preset?.saveToOutput ?? false)
   const [replayOpen, setReplayOpen] = useState(false)
   const [loadingResult, setLoadingResult] = useState(false)
   const [stopping, setStopping] = useState(false)

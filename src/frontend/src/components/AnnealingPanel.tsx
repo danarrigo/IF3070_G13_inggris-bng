@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import type { SAImport } from '../experimentImport'
 import { streamAnnealing, loadAnnealingRuns } from '../api/annealing'
 import type { Config } from '../types/config'
 import { arrangementConfig } from '../types/run'
@@ -117,21 +118,25 @@ export default function AnnealingPanel({
   config,
   onPreview,
   onRunningChange,
+  preset,
 }: {
+  preset?: SAImport
   config: Config
   onPreview: (config: Config | null) => void
   onRunningChange: (running: boolean) => void
 }) {
-  const [settings, setSettings] = useState<AnnealingSettings>({
-    algorithm: 'simulated_annealing',
-    iterations: 1000,
-    initial_temperature: 1000,
-    cooling_rate: 0.995,
-    minimum_temperature: 0.001,
-    stagnation_window: 100,
-  })
-  const [seed, setSeed] = useState(42)
-  const [saveToOutput, setSaveToOutput] = useState(false)
+  const [settings, setSettings] = useState<AnnealingSettings>(
+    preset?.settings ?? {
+      algorithm: 'simulated_annealing',
+      iterations: 1000,
+      initial_temperature: 1000,
+      cooling_rate: 0.995,
+      minimum_temperature: 0.001,
+      stagnation_window: 100,
+    }
+  )
+  const [seed, setSeed] = useState(preset?.seed ?? 42)
+  const [saveToOutput, setSaveToOutput] = useState(preset?.saveToOutput ?? false)
   const [runs, setRuns] = useState<SearchRun[]>([])
   const [selected, setSelected] = useState(0)
   const [frame, setFrame] = useState(0)
@@ -258,7 +263,7 @@ export default function AnnealingPanel({
       <form
         onSubmit={(event) => {
           event.preventDefault()
-          void execute(1)
+          void execute(preset?.runCount ?? 1)
         }}
       >
         <fieldset className="editor-fieldset" disabled={busy}>
@@ -310,7 +315,7 @@ export default function AnnealingPanel({
           </p>
           <div className="sa-actions">
             <button type="submit" className="primary">
-              Run SA
+              {preset?.runCount === 3 ? 'Run SA (3 experiments)' : 'Run SA'}
             </button>
             <button
               type="button"
